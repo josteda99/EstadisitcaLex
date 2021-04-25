@@ -1,5 +1,6 @@
 %{
     #include <math.h>
+    #include <stdio.h>
     #define IF 1 
     #define ELSE 2
     #define ID 3
@@ -37,10 +38,12 @@
     #define ARRAY 35
     #define BINOP 36
     #define ARITOP 37
-    #define FUNCTION 37
-    int yylval;
-    int pointer = 0; 
+    #define FUNCTION 38
+    int yylval = -1;
+    int pointerNum = 0; 
+    int pointerID = 0; 
     int tableNum[50];
+    char *tableID[50];
 %}
 
 /* regular definitions */
@@ -66,7 +69,7 @@ return      {return RETURN;}
 "<"         {yylval = LT; return RELOP;} 
 "<="        {yylval = LE; return RELOP;} 
 "=="        {yylval = EQ; return RELOP;} 
-"<>"        {yylval = NE; return RELOP;} 
+"!="        {yylval = NE; return RELOP;} 
 ">"         {yylval = GT; return RELOP;} 
 ">="        {yylval = GE; return RELOP;}
 "("         {yylval = LG; return GROUP;}
@@ -84,7 +87,8 @@ return      {return RETURN;}
 "}"         {yylval = RF; return FUNCTION;}
 "="         {return ASIG;}
 {com}       {return COM;}
-{number}    {tableNum[pointer] = atoi(yytext); yylval = pointer++; return NUMBER;}
+{number}    {tableNum[pointerNum] = atoi(yytext); yylval = pointerNum++; return NUMBER;}
+{id}        {tableID[pointerID] = yytext; yylval = pointerID++; return ID;}
                                 
 "/*"        {register int c;
                 for ( ; ; ) {
@@ -104,20 +108,17 @@ return      {return RETURN;}
 
 int yywrap() {}
 
-int installID() {
-    /* function to install the lexeme, whose first character is pointed to by yytext, and whose length is yyleng, into the symbol table and return a pointer thereto */
-}
-
-int installNum() {
-    tableNum[pointer] = atoi(yytext); yylval = pointer++;
-}
-
 int main(argc,argv)
 int argc;
 char *argv[];
 {
     int val;
     while(val = yylex()){
-        printf("value is %d -> lexeme %s, yylval: %d\n",val, yytext, yylval);
+        if(yylval != -1 && val < 33 ){
+            printf("Token is ---> %d lexeme --->  %s Pointer is ---> %d\n",val, yytext, yylval);
+        }else{
+            printf("Token is ---> %d lexeme --->  %s\n",val, yytext);
+        }
+        yylval = -1;
     }
 }
