@@ -857,7 +857,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 93 "tokens.l"
+#line 92 "tokens.l"
 {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */
@@ -875,7 +875,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 107 "tokens.l"
+#line 106 "tokens.l"
 ECHO;
 	YY_BREAK
 #line 882 "lex.yy.c"
@@ -1764,10 +1764,10 @@ int main()
 	return 0;
 	}
 #endif
-#line 107 "tokens.l"
+#line 106 "tokens.l"
 
 
-int yywrap() {return 1;}
+int yywrap() {}
 
 int main(argc,argv)
 int argc;
@@ -1790,5 +1790,13 @@ char **argv;
             printf("Token is ---> %d lexeme --->  %s\n",val, yytext);
         }
         yylval = -1;
+    }
+    printf("\n------------------------------\n%s\n", "Number Table");
+    for(int i = 0; i < pointerNum; i++) {
+        printf("[%d]\t|\t%d\n", i, tableNum[i]);
+    }
+    printf("------------------------------\n%s\n", "Symbol Table");
+    for(int i = 0; i < pointerID; i++) {
+        printf("[%d] \t|\t%s\n", i, tableID[i]);
     }
 }

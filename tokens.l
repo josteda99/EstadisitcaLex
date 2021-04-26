@@ -89,7 +89,6 @@ return      {return RETURN;}
 {com}       {return COM;}
 {number}    {tableNum[pointerNum] = atoi(yytext); yylval = pointerNum++; return NUMBER;}
 {id}        {tableID[pointerID] = yytext; yylval = pointerID++; return ID;}
-                                
 "/*"        {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */
@@ -106,7 +105,7 @@ return      {return RETURN;}
             }
 %%
 
-int yywrap() {return 1;}
+int yywrap() {}
 
 int main(argc,argv)
 int argc;
@@ -129,5 +128,13 @@ char **argv;
             printf("Token is ---> %d lexeme --->  %s\n",val, yytext);
         }
         yylval = -1;
+    }
+    printf("\n------------------------------\n%s\n", "Number Table");
+    for(int i = 0; i < pointerNum; i++) {
+        printf("[%d]\t|\t%d\n", i, tableNum[i]);
+    }
+    printf("------------------------------\n%s\n", "Symbol Table");
+    for(int i = 0; i < pointerID; i++) {
+        printf("[%d] \t|\t%s\n", i, tableID[i]);
     }
 }
