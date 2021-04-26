@@ -1,0 +1,7 @@
+if(x == 0) {
+    y = 15
+}
+
+while(true) {
+    var = 12
+}

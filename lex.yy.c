@@ -1767,12 +1767,21 @@ int main()
 #line 107 "tokens.l"
 
 
-int yywrap() {}
+int yywrap() {return 1;}
 
 int main(argc,argv)
 int argc;
-char *argv[];
+char **argv;
 {
+    FILE *file;
+    if (argc == 2){
+		file = fopen(argv[1],"r");
+		if(!file){
+			fprintf(stderr, "could not open %s\n",argv[1]);
+			exit(1);
+		}
+		yyin = file;
+	}
     int val;
     while(val = yylex()){
         if(yylval != -1 && val < 33 ){
