@@ -1,0 +1,16 @@
+// Line de comentario la cual es ignorada por el analizador lexico
+/*
+	Bloque de comentarios
+	Aca se puede escribir sin afectar el programa
+	El bloque de comentasrios tambien es ignorado por el analizador
+	Permite incluso simbolos matematicos y = x^2 + 2x - 2
+*/
+y = 0
+x = 10
+if(x <= 20) {
+	y = x**2 + 2*x - 2
+} else {
+	while(x > 20) {
+		x = x - 1
+	} 
+}
