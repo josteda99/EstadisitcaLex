@@ -1,0 +1,33 @@
+stat ::= if_stat | for_stat | while_stat | print_stat | condition | asig | num | cont | array | matrix |  call_function
+
+for_stat ::= 'for' '(' asig ';' condition ';' cont ')' '{' stat '}'
+
+while_stat ::= 'while''(' condition ')' '{'stat'}'
+
+print_stat ::= 'print' '(' 'id' ')'
+
+condition ::= (bool_cond | num_cond) (('&''&' | '|''|') condition)? 
+
+bool_cond ::= 'id' | 'id' neq_eq (true | false)
+
+neq_eq ::= '==' | '!='
+
+num_cond ::= 'id' oper num
+
+oper ::= neq_eq | '<' | '<=' | '>=' | '>' 
+
+num ::= 'number'
+
+cont ::= '+''+'num | '-''-'num | num'+''+' | num'-''-'
+
+array ::= '[' (num ',')* ']'
+
+matrix ::= '[' (array',')* ']'
+
+asig  ::= 'id' ( '[' num ']' ( '[' num ']' )? )? '=' num
+
+function ::= fun 'id' '(' 'id'* ')' '{' stat ('return' ('id' | num))? '}'
+
+call_function ::= 'id' '(' 'id'* ')' 
+
+if_stat ::= 'if' '(' condition ')' '{' stat'}' ('else' '{'stat'}' )? 

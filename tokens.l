@@ -39,6 +39,9 @@
     #define BINOP 36
     #define ARITOP 37
     #define FUNCTION 38
+    #define SEMICOLON 39
+    #define COMMAN 40
+    #define FUN 41
     int yylval = -1;
     int pointerNum = 0; 
     int pointerID = 0; 
@@ -66,6 +69,7 @@ print       {return PRINT;}
 false       {return FALSE;}
 true        {return TRUE;}
 return      {return RETURN;}
+fun         {return FUN;}
 "<"         {yylval = LT; return RELOP;} 
 "<="        {yylval = LE; return RELOP;} 
 "=="        {yylval = EQ; return RELOP;} 
@@ -85,6 +89,8 @@ return      {return RETURN;}
 "**"        {yylval = POT; return ARITOP;}
 "{"         {yylval = LF; return FUNCTION;}
 "}"         {yylval = RF; return FUNCTION;}
+";"         {return SEMICOLON;}
+","         {return COMMAN;}
 "="         {return ASIG;}
 {com}       {return COM;}
 {number}    {tableNum[pointerNum] = atoi(yytext); yylval = pointerNum++; return NUMBER;}
