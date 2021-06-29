@@ -1,3 +1,5 @@
+linea ::= ( ( stat | function ) '\n' )*
+
 stat ::= if_stat | for_stat | while_stat | print_stat | condition | asig | num | cont | array | matrix |  call_function
 
 for_stat ::= 'for' '(' asig ';' condition ';' cont ')' '{' stat '}'
@@ -24,10 +26,12 @@ array ::= '[' (num ',')* ']'
 
 matrix ::= '[' (array',')* ']'
 
-asig  ::= 'id' ( '[' num ']' ( '[' num ']' )? )? '=' num
+asig  ::= 'id' ( '[' num ']' ( '[' num ']' )? )? '=' expr
 
 function ::= fun 'id' '(' 'id'* ')' '{' stat ('return' ('id' | num))? '}'
 
 call_function ::= 'id' '(' 'id'* ')' 
 
 if_stat ::= 'if' '(' condition ')' '{' stat'}' ('else' '{'stat'}' )? 
+
+expr ::= expr '+' expr | expr '-' expr | expr '*' expr |expr '/' expr | '('expr')' | '-' expr | num
