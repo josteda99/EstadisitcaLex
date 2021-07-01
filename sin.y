@@ -1,15 +1,50 @@
 %{
-#include <stdio.h>
+%include <stdio.h>
 int yylex();
 int yyerror(char *s);
 
 %}
-
-%token STRING 
-%token NUM 
-%token OTHER 
-%token SEMICOLON
-
+%token IF 
+%token ELSE 
+%token ID 
+%token NUMBER 
+%token FOR 
+%token WHILE 
+%token COM 
+%token BCOM 
+%token LT 
+%token LE 
+%token EQ 
+%token NE 
+%token GT 
+%token GE 
+%token PRINT 
+%token LG 
+%token RG 
+%token LR 
+%token RR 
+%token AB 
+%token OB 
+%token ADD 
+%token SUB 
+%token MUL 
+%token DIV 
+%token POT 
+%token FALSE 
+%token TRUE 
+%token LF 
+%token RF 
+%token ASIG 
+%token RETURN 
+%token RELOP 
+%token GROUP 
+%token ARRAY 
+%token BINOP 
+%token ARITOP 
+%token FUNCTION 
+%token SEMICOLON 
+%token COMMAN 
+%token FUN 
 %type <name> STRING
 %type <number> NUM
 
@@ -85,16 +120,6 @@ function    : fun 'id' '(' 'id'* ')' '{' stat ('return' ('id' | num))? '}'
 call_function : 'id' '(' 'id'* ')' ;   
 
 if_stat     : 'if' '(' condition ')' '{' stat'}' ('else' '{'stat'}' )?; 
-
-
-prog: stmts;
-
-stmts:
-      | stmt SEMICOLON stmts
-
-stmt: STRING      {printf("Your entered a string - %s", $1);}
-	| NUM       {printf("The number you entered is - %d", $1);}
-	| OTHER;
 
 %%
 
