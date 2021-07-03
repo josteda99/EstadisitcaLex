@@ -47,6 +47,14 @@
     int pointerID = 0; 
     int tableNum[50];
     char *tableID[50];
+
+    // -> x _ _ _ _ _ _ _ _ _ _ ....
+    // -> v a r _ _ _ _ ........
+
+
+    // 50 ->
+
+    void insertID();
 %}
 
 /* regular definitions */
@@ -94,7 +102,7 @@ fun         {return FUN;}
 "="         {return ASIG;}
 {com}       {return COM;}
 {number}    {tableNum[pointerNum] = atoi(yytext); yylval = pointerNum++; return NUMBER;}
-{id}        {tableID[pointerID] = yytext; yylval = pointerID++; return ID;}
+{id}        {insertID(); return ID;}
 "/*"        {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */
@@ -141,6 +149,34 @@ char **argv;
     }
     printf("------------------------------\n%s\n", "Symbol Table");
     for(int i = 0; i < pointerID; i++) {
+        
         printf("[%d] \t|\t%s\n", i, tableID[i]);
+    }
+}
+
+
+
+void insertID() 
+{ 
+    int i = 0;
+    int inTable = 0;
+    
+    for(i = 0; i < pointerID; i++)
+    {
+        if(strcmp(tableID[i], yytext) == 0)
+        {
+            inTable = 1;
+            break;
+        }
+    }
+
+    if (i == pointerID) 
+    {
+        tableID[pointerID] = strdup(yytext);
+        yylval = pointerID++;
+    }else{
+        if(inTable == 1) {
+         yylval = i;
+        }
     }
 }
