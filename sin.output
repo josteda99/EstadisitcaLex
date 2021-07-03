@@ -1,0 +1,382 @@
+Terminals unused in grammar
+
+    IF
+    ELSE
+    ID
+    FOR
+    WHILE
+    COM
+    BCOM
+    LT
+    LE
+    EQ
+    NE
+    GT
+    GE
+    PRINT
+    LR
+    RR
+    AB
+    OB
+    FALSE
+    TRUE
+    LF
+    RF
+    ASIG
+    RETURN
+    ARITOP
+    FUN
+    RELOP
+    GROUP
+    ARRAY
+    BINOP
+    FUNCTION
+    SEMICOLON
+    COMMAN
+
+
+Grammar
+
+    0 $accept: Input $end
+
+    1 Input: %empty
+    2      | Input Line
+
+    3 Line: END
+    4     | expr END
+
+    5 expr: expr ADD expr
+    6     | expr SUB expr
+    7     | expr MUL expr
+    8     | expr DIV expr
+    9     | expr POT expr
+   10     | LG expr RG
+   11     | SUB expr
+   12     | NUMBER
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    IF (258)
+    ELSE (259)
+    ID <name> (260)
+    NUMBER <num> (261) 12
+    FOR (262)
+    WHILE (263)
+    COM (264)
+    BCOM (265)
+    LT (266)
+    LE (267)
+    EQ (268)
+    NE (269)
+    GT (270)
+    GE (271)
+    PRINT (272)
+    LG (273) 10
+    RG (274) 10
+    LR (275)
+    RR (276)
+    AB (277)
+    OB (278)
+    ADD (279) 5
+    SUB (280) 6 11
+    MUL (281) 7
+    DIV (282) 8
+    POT (283) 9
+    FALSE (284)
+    TRUE (285)
+    LF (286)
+    RF (287)
+    ASIG (288)
+    RETURN (289)
+    ARITOP (290)
+    FUN (291)
+    RELOP (292)
+    GROUP (293)
+    ARRAY (294)
+    BINOP (295)
+    FUNCTION (296)
+    SEMICOLON (297)
+    COMMAN (298)
+    END (299) 3 4
+    UMINUS (300)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (46)
+        on left: 0
+    Input (47)
+        on left: 1 2
+        on right: 0 2
+    Line (48)
+        on left: 3 4
+        on right: 2
+    expr <num> (49)
+        on left: 5 6 7 8 9 10 11 12
+        on right: 4 5 6 7 8 9 10 11
+
+
+State 0
+
+    0 $accept: . Input $end
+
+    $default  reduce using rule 1 (Input)
+
+    Input  go to state 1
+
+
+State 1
+
+    0 $accept: Input . $end
+    2 Input: Input . Line
+
+    $end    shift, and go to state 2
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+    END     shift, and go to state 6
+
+    Line  go to state 7
+    expr  go to state 8
+
+
+State 2
+
+    0 $accept: Input $end .
+
+    $default  accept
+
+
+State 3
+
+   12 expr: NUMBER .
+
+    $default  reduce using rule 12 (expr)
+
+
+State 4
+
+   10 expr: LG . expr RG
+
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+
+    expr  go to state 9
+
+
+State 5
+
+   11 expr: SUB . expr
+
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+
+    expr  go to state 10
+
+
+State 6
+
+    3 Line: END .
+
+    $default  reduce using rule 3 (Line)
+
+
+State 7
+
+    2 Input: Input Line .
+
+    $default  reduce using rule 2 (Input)
+
+
+State 8
+
+    4 Line: expr . END
+    5 expr: expr . ADD expr
+    6     | expr . SUB expr
+    7     | expr . MUL expr
+    8     | expr . DIV expr
+    9     | expr . POT expr
+
+    ADD  shift, and go to state 11
+    SUB  shift, and go to state 12
+    MUL  shift, and go to state 13
+    DIV  shift, and go to state 14
+    POT  shift, and go to state 15
+    END  shift, and go to state 16
+
+
+State 9
+
+    5 expr: expr . ADD expr
+    6     | expr . SUB expr
+    7     | expr . MUL expr
+    8     | expr . DIV expr
+    9     | expr . POT expr
+   10     | LG expr . RG
+
+    RG   shift, and go to state 17
+    ADD  shift, and go to state 11
+    SUB  shift, and go to state 12
+    MUL  shift, and go to state 13
+    DIV  shift, and go to state 14
+    POT  shift, and go to state 15
+
+
+State 10
+
+    5 expr: expr . ADD expr
+    6     | expr . SUB expr
+    7     | expr . MUL expr
+    8     | expr . DIV expr
+    9     | expr . POT expr
+   11     | SUB expr .
+
+    $default  reduce using rule 11 (expr)
+
+
+State 11
+
+    5 expr: expr ADD . expr
+
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+
+    expr  go to state 18
+
+
+State 12
+
+    6 expr: expr SUB . expr
+
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+
+    expr  go to state 19
+
+
+State 13
+
+    7 expr: expr MUL . expr
+
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+
+    expr  go to state 20
+
+
+State 14
+
+    8 expr: expr DIV . expr
+
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+
+    expr  go to state 21
+
+
+State 15
+
+    9 expr: expr POT . expr
+
+    NUMBER  shift, and go to state 3
+    LG      shift, and go to state 4
+    SUB     shift, and go to state 5
+
+    expr  go to state 22
+
+
+State 16
+
+    4 Line: expr END .
+
+    $default  reduce using rule 4 (Line)
+
+
+State 17
+
+   10 expr: LG expr RG .
+
+    $default  reduce using rule 10 (expr)
+
+
+State 18
+
+    5 expr: expr . ADD expr
+    5     | expr ADD expr .
+    6     | expr . SUB expr
+    7     | expr . MUL expr
+    8     | expr . DIV expr
+    9     | expr . POT expr
+
+    MUL  shift, and go to state 13
+    DIV  shift, and go to state 14
+    POT  shift, and go to state 15
+
+    $default  reduce using rule 5 (expr)
+
+
+State 19
+
+    5 expr: expr . ADD expr
+    6     | expr . SUB expr
+    6     | expr SUB expr .
+    7     | expr . MUL expr
+    8     | expr . DIV expr
+    9     | expr . POT expr
+
+    MUL  shift, and go to state 13
+    DIV  shift, and go to state 14
+    POT  shift, and go to state 15
+
+    $default  reduce using rule 6 (expr)
+
+
+State 20
+
+    5 expr: expr . ADD expr
+    6     | expr . SUB expr
+    7     | expr . MUL expr
+    7     | expr MUL expr .
+    8     | expr . DIV expr
+    9     | expr . POT expr
+
+    POT  shift, and go to state 15
+
+    $default  reduce using rule 7 (expr)
+
+
+State 21
+
+    5 expr: expr . ADD expr
+    6     | expr . SUB expr
+    7     | expr . MUL expr
+    8     | expr . DIV expr
+    8     | expr DIV expr .
+    9     | expr . POT expr
+
+    POT  shift, and go to state 15
+
+    $default  reduce using rule 8 (expr)
+
+
+State 22
+
+    5 expr: expr . ADD expr
+    6     | expr . SUB expr
+    7     | expr . MUL expr
+    8     | expr . DIV expr
+    9     | expr . POT expr
+    9     | expr POT expr .
+
+    POT  shift, and go to state 15
+
+    $default  reduce using rule 9 (expr)

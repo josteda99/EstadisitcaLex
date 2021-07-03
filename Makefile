@@ -1,5 +1,5 @@
 default:
 	clear
-	flex -l file.l
-	bison -dv sinsem.y 
-	gcc -o ./a.out .tab.c lex.yy.c -lfl
+	flex -l tokens.l
+	bison -dv sin.y 
+	gcc -o ./c.out sin.tab.c lex.yy.c -lfl -lm

@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_SINSEM_TAB_H_INCLUDED
-# define YY_YY_SINSEM_TAB_H_INCLUDED
+#ifndef YY_YY_SIN_TAB_H_INCLUDED
+# define YY_YY_SIN_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -49,10 +49,49 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    STRING = 258,
-    NUM = 259,
-    OTHER = 260,
-    SEMICOLON = 261
+    IF = 258,
+    ELSE = 259,
+    ID = 260,
+    NUMBER = 261,
+    FOR = 262,
+    WHILE = 263,
+    COM = 264,
+    BCOM = 265,
+    LT = 266,
+    LE = 267,
+    EQ = 268,
+    NE = 269,
+    GT = 270,
+    GE = 271,
+    PRINT = 272,
+    LG = 273,
+    RG = 274,
+    LR = 275,
+    RR = 276,
+    AB = 277,
+    OB = 278,
+    ADD = 279,
+    SUB = 280,
+    MUL = 281,
+    DIV = 282,
+    POT = 283,
+    FALSE = 284,
+    TRUE = 285,
+    LF = 286,
+    RF = 287,
+    ASIG = 288,
+    RETURN = 289,
+    ARITOP = 290,
+    FUN = 291,
+    RELOP = 292,
+    GROUP = 293,
+    ARRAY = 294,
+    BINOP = 295,
+    FUNCTION = 296,
+    SEMICOLON = 297,
+    COMMAN = 298,
+    END = 299,
+    UMINUS = 300
   };
 #endif
 
@@ -60,12 +99,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "sinsem.y"
+#line 20 "sin.y"
 
-	  char name[20];
+    char *name;
     int number;
+    double num;
 
-#line 69 "sinsem.tab.h"
+#line 109 "sin.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -78,4 +118,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_SINSEM_TAB_H_INCLUDED  */
+#endif /* !YY_YY_SIN_TAB_H_INCLUDED  */
