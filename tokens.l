@@ -1,15 +1,15 @@
 %{
     #include <math.h>
     #include <string.h>
-    int yylval = -1;
-    int pointerNum = 0;
+    #include "sin.tab.h"
     int pointerID = 0;
-    int tableNum[50];
     char *tableID[50];
+    int yywrap();
+    void insertID();
 %}
 
 /* regular definitions */
-delim       [ \t\n]
+delim       [ \t]
 ws          {delim}+
 letter      [A-Za-z]
 digit       [0-9]
@@ -29,31 +29,31 @@ false       {return FALSE;}
 true        {return TRUE;}
 return      {return RETURN;}
 fun         {return FUN;}
-"<"         {yylval.number = LT; return RELOP;} 
-"<="        {yylval.number = LE; return RELOP;} 
-"=="        {yylval.number = EQ; return RELOP;} 
-"!="        {yylval.number = NE; return RELOP;} 
-">"         {yylval.number = GT; return RELOP;} 
-">="        {yylval.number = GE; return RELOP;}
-"("         {yylval.number = LG; return GROUP;}
-")"         {yylval.number = RG; return GROUP;}
-"["         {yylval.number = LR; return ARRAY;}
-"]"         {yylval.number = RR; return ARRAY;}
-"&"         {yylval.number = AB; return BINOP;}
-"|"         {yylval.number = OB; return BINOP;}
-"+"         {yylval.number = ADD; return ARITOP;}
-"-"         {yylval.number = SUB; return ARITOP;}
-"*"         {yylval.number = MUL; return ARITOP;}
-"/"         {yylval.number = DIV; return ARITOP;}
-"**"        {yylval.number = POT; return ARITOP;}
-"{"         {yylval.number = LF; return FUNCTION;}
-"}"         {yylval.number = RF; return FUNCTION;}
+"<"         {return LT;} 
+"<="        {return LE;} 
+"=="        {return EQ;} 
+"!="        {return NE;} 
+">"         {return GT;} 
+">="        {return GE;}
+"("         {return LG;}
+")"         {return RG;}
+"["         {return LR;}
+"]"         {return RR;}
+"&"         {return AB;}
+"|"         {return OB;}
+"+"         {return ADD;}
+"-"         {return SUB;}
+"*"         {return MUL;}
+"/"         {return DIV;}
+"**"        {return POT;}
+"{"         {return LF;}
+"}"         {return RF;}
 ";"         {return SEMICOLON;}
 ","         {return COMMAN;}
 "="         {return ASIG;}
 {com}       {return COM;}
-{number}    {tableNum[pointerNum] = atoi(yytext); yylval.number = pointerNum++; return NUMBER;}
-{id}        { return ID;}
+{number}    {yylval.num = atof(yytext); return NUMBER;}
+{id}        {insertID(); return ID;}
 "/*"        {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */
@@ -68,24 +68,30 @@ fun         {return FUN;}
                     }
                 }; return BCOM;
             }
+"\n"        {return END;};
 %%
 int yywrap() {}
 
 void insertID() 
 { 
     int i = 0;
+    int inTable = 0;
     for(i = 0; i < pointerID; i++)
     {
         if(strcmp(tableID[i], yytext) == 0)
         {
+            inTable = 1;
             break;
         }
     }
     if (i == pointerID) 
     {
-        tableID[pointerID] = yytext;
+        tableID[pointerID] = strdup(yytext);
+        yylval.name = strdup(yytext);
         yylval.number = pointerID++;
-    } else {
-        yylval.number = i;
+    }else{
+        if(inTable == 1) {
+            yylval.number = i;
+        }
     }
 }
