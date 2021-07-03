@@ -1,60 +1,31 @@
 %{
-%include <stdio.h>
+#include <stdio.h>
 int yylex();
 int yyerror(char *s);
 
 %}
-%token IF 
-%token ELSE 
-%token ID 
-%token NUMBER 
-%token FOR 
-%token WHILE 
-%token COM 
-%token BCOM 
-%token LT 
-%token LE 
-%token EQ 
-%token NE 
-%token GT 
-%token GE 
-%token PRINT 
-%token LG 
-%token RG 
-%token LR 
-%token RR 
-%token AB 
-%token OB 
-%token ADD 
-%token SUB 
-%token MUL 
-%token DIV 
-%token POT 
-%token FALSE 
-%token TRUE 
-%token LF 
-%token RF 
-%token ASIG 
-%token RETURN 
-%token RELOP 
-%token GROUP 
-%token ARRAY 
-%token BINOP 
-%token ARITOP 
-%token FUNCTION 
-%token SEMICOLON 
-%token COMMAN 
-%token FUN 
-%type <name> STRING
-%type <number> NUM
+%token IF ELSE ID NUMBER
+%token FOR WHILE COM  BCOM 
+%token LT LE  EQ  NE  GT  GE 
+%token PRINT LG RG LR RR AB 
+%token OB ADD SUB MUL DIV POT 
+%token FALSE TRUE LF RF ASIG 
+%token RETURN ARITOP FUN
+%token RELOP GROUP ARRAY BINOP 
+%token FUNCTION SEMICOLON COMMAN  
+%type <name> ID
+%type <number> NUMBER
 
 %union{
-	  char name[20];
+    char name[20];
     int number;
 }
 
-%%
+%left '+' '-'
+%left '*' '/'
+%right 'UMINUS'
 
+%%
 
 linea       : linea expr '\n'             {printf("%g\n, $2");}
             | linea '\n'
@@ -129,8 +100,19 @@ int yyerror(char *s)
 	return 0;
 }
 
-int main()
+int main(argc,argv)
+int argc;
+char **argv;
 {
+   // FILE *file;
+   // if (argc == 2){
+	// 	file = fopen(argv[1],"r");
+	// 	if(!file){
+	// 		fprintf(stderr, "could not open %s\n",argv[1]);
+	// 		exit(1);
+	// 	}
+	// 	yyin = file;
+	// }
     yyparse();
     return 0;
 }
