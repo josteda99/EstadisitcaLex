@@ -8,9 +8,11 @@ while_stat ::= 'while''(' condition ')' '{'stat'}'
 
 print_stat ::= 'print' '(' 'id' ')'
 
-condition ::= (bool_cond | num_cond) (('&''&' | '|''|') condition)? 
+//condition ::= (bool_cond | num_cond) (('&''&' | '|''|') condition)? 
+condition ::= bool_cond '&''&' condition | bool_cond '|''|' condition | num_cond '&''&' condition | num_cond '|''|' condition | bool_cond | num_cond
 
-bool_cond ::= 'id' | 'id' neq_eq (true | false)
+//bool_cond ::= 'id' | 'id' neq_eq (true | false)
+bool_cond ::= 'id' | 'id' neq_eq true |'id' neq_eq false
 
 neq_eq ::= '==' | '!='
 

@@ -2,6 +2,7 @@
     #include <math.h>
     #include <string.h>
     #include "sin.tab.h"
+    #define YYSTYPE double
     int pointerID = 0;
     char *tableID[50];
     int yywrap();
@@ -14,7 +15,7 @@ ws          {delim}+
 letter      [A-Za-z]
 digit       [0-9]
 id          {letter}({letter}|{digit})*
-number      {digit}+(\.{digit}+)?(E[+-]?{digit}+)?
+double      {digit}+(\.{digit}+)?(E[+-]?{digit}+)?
 slash       "/"
 com         {slash}{slash}(ws|.)*\n
 %%
@@ -52,7 +53,7 @@ fun         {return FUN;}
 ","         {return COMMAN;}
 "="         {return ASIG;}
 {com}       {return COM;}
-{number}    {yylval.num = atof(yytext); return NUMBER;}
+{double}    {yylval.real = atof(yytext); return DOUBLE;}
 {id}        {insertID(); return ID;}
 "/*"        {register int c;
                 for ( ; ; ) {
@@ -88,10 +89,10 @@ void insertID()
     {
         tableID[pointerID] = strdup(yytext);
         yylval.name = strdup(yytext);
-        yylval.number = pointerID++;
+        yylval.integer = pointerID++;
     }else{
         if(inTable == 1) {
-            yylval.number = i;
+            yylval.integer = i;
         }
     }
 }

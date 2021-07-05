@@ -528,13 +528,14 @@ char *yytext_ptr;
     #include <math.h>
     #include <string.h>
     #include "sin.tab.h"
+    #define YYSTYPE double
     int pointerID = 0;
     char *tableID[50];
     int yywrap();
     void insertID();
-#line 536 "lex.yy.c"
+#line 537 "lex.yy.c"
 /* regular definitions */
-#line 538 "lex.yy.c"
+#line 539 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -751,10 +752,10 @@ YY_DECL
 		}
 
 	{
-#line 20 "tokens.l"
+#line 21 "tokens.l"
 
 
-#line 758 "lex.yy.c"
+#line 759 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -823,183 +824,183 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 22 "tokens.l"
+#line 23 "tokens.l"
 {/* no action and no return */} 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 23 "tokens.l"
+#line 24 "tokens.l"
 {return IF;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 24 "tokens.l"
+#line 25 "tokens.l"
 {return ELSE;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 25 "tokens.l"
+#line 26 "tokens.l"
 {return FOR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 26 "tokens.l"
+#line 27 "tokens.l"
 {return WHILE;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 27 "tokens.l"
+#line 28 "tokens.l"
 {return PRINT;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 28 "tokens.l"
+#line 29 "tokens.l"
 {return FALSE;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 29 "tokens.l"
+#line 30 "tokens.l"
 {return TRUE;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 30 "tokens.l"
+#line 31 "tokens.l"
 {return RETURN;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 31 "tokens.l"
+#line 32 "tokens.l"
 {return FUN;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 32 "tokens.l"
+#line 33 "tokens.l"
 {return LT;} 
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 33 "tokens.l"
+#line 34 "tokens.l"
 {return LE;} 
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 34 "tokens.l"
+#line 35 "tokens.l"
 {return EQ;} 
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 35 "tokens.l"
+#line 36 "tokens.l"
 {return NE;} 
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 36 "tokens.l"
+#line 37 "tokens.l"
 {return GT;} 
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 37 "tokens.l"
+#line 38 "tokens.l"
 {return GE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 38 "tokens.l"
+#line 39 "tokens.l"
 {return LG;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 39 "tokens.l"
+#line 40 "tokens.l"
 {return RG;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 40 "tokens.l"
+#line 41 "tokens.l"
 {return LR;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 41 "tokens.l"
+#line 42 "tokens.l"
 {return RR;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 42 "tokens.l"
+#line 43 "tokens.l"
 {return AB;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 43 "tokens.l"
+#line 44 "tokens.l"
 {return OB;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 44 "tokens.l"
+#line 45 "tokens.l"
 {return ADD;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 45 "tokens.l"
+#line 46 "tokens.l"
 {return SUB;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 46 "tokens.l"
+#line 47 "tokens.l"
 {return MUL;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 47 "tokens.l"
+#line 48 "tokens.l"
 {return DIV;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 48 "tokens.l"
+#line 49 "tokens.l"
 {return POT;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 49 "tokens.l"
+#line 50 "tokens.l"
 {return LF;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 50 "tokens.l"
+#line 51 "tokens.l"
 {return RF;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 51 "tokens.l"
+#line 52 "tokens.l"
 {return SEMICOLON;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 52 "tokens.l"
+#line 53 "tokens.l"
 {return COMMAN;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 53 "tokens.l"
+#line 54 "tokens.l"
 {return ASIG;}
 	YY_BREAK
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 54 "tokens.l"
+#line 55 "tokens.l"
 {return COM;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 55 "tokens.l"
-{yylval.num = atof(yytext); return NUMBER;}
+#line 56 "tokens.l"
+{yylval.real = atof(yytext); return DOUBLE;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 56 "tokens.l"
+#line 57 "tokens.l"
 {insertID(); return ID;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 57 "tokens.l"
+#line 58 "tokens.l"
 {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */
@@ -1018,15 +1019,15 @@ YY_RULE_SETUP
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 71 "tokens.l"
+#line 72 "tokens.l"
 {return END;};
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 72 "tokens.l"
+#line 73 "tokens.l"
 ECHO;
 	YY_BREAK
-#line 1030 "lex.yy.c"
+#line 1031 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2043,7 +2044,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 72 "tokens.l"
+#line 73 "tokens.l"
 
 int yywrap() {}
 
@@ -2063,10 +2064,10 @@ void insertID()
     {
         tableID[pointerID] = strdup(yytext);
         yylval.name = strdup(yytext);
-        yylval.number = pointerID++;
+        yylval.integer = pointerID++;
     }else{
         if(inTable == 1) {
-            yylval.number = i;
+            yylval.integer = i;
         }
     }
 }

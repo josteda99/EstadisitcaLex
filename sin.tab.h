@@ -52,7 +52,7 @@ extern int yydebug;
     IF = 258,
     ELSE = 259,
     ID = 260,
-    NUMBER = 261,
+    DOUBLE = 261,
     FOR = 262,
     WHILE = 263,
     COM = 264,
@@ -102,8 +102,8 @@ union YYSTYPE
 #line 20 "sin.y"
 
     char *name;
-    int number;
-    double num;
+    int integer;
+    double real;
 
 #line 109 "sin.tab.h"
 

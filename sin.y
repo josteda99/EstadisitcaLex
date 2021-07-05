@@ -4,7 +4,7 @@
 extern int yylex(void);
 int yyerror(char *s);
 %}
-%token IF ELSE ID NUMBER
+%token IF ELSE ID DOUBLE
 %token FOR WHILE COM  BCOM 
 %token LT LE  EQ  NE  GT  GE 
 %token PRINT LG RG LR RR AB 
@@ -14,13 +14,13 @@ int yyerror(char *s);
 %token RELOP GROUP ARRAY BINOP 
 %token FUNCTION SEMICOLON COMMAN END
 %type <name> ID
-%type <num> NUMBER
-%type <num> expr
+%type <real> DOUBLE
+%type <real> expr
 
 %union{
     char *name;
-    int number;
-    double num;
+    int integer;
+    double real;
 }
 
 %left ADD SUB
@@ -28,78 +28,98 @@ int yyerror(char *s);
 %right POT
 %right UMINUS
 
-%start Input
+%start prog
 
 %%
 
-Input: /* empty */;
-Input: Input Line;
+prog: stmts;
 
-Line: END;
-Line: expr END                    {printf("Resultado: %f\n", $1);};
+stmts: /* empty */
+     | stat stmts;
 
-expr: expr ADD expr               {$$ = $1 + $3; printf("%f + %f\n", $1, $3);};
-expr: expr SUB expr               {$$ = $1 - $3; printf("%f - %f\n", $1, $3);};
-expr: expr MUL expr               {$$ = $1 * $3; printf("%f * %f\n", $1, $3);};
-expr: expr DIV expr               {$$ = $1 / $3; printf("%f / %f\n", $1, $3);};
-expr: expr POT expr               {$$ = pow($1, $3); printf("%f ^ %f\n", $1, $3);};
-expr: LG expr RG                  {$$ = $2; };
-expr: SUB expr  %prec UMINUS      {$$ = - $2;};
-expr: NUMBER;
+expr: expr ADD expr               {$$ = $1 + $3;}
+    | expr SUB expr               {$$ = $1 - $3;}
+    | expr MUL expr               {$$ = $1 * $3;}
+    | expr DIV expr               {$$ = $1 / $3;}
+    | expr POT expr               {$$ = pow($1, $3);}
+    | LG expr RG                  {$$ = $2;}
+    | SUB expr  %prec UMINUS      {$$ = - $2;}
+    | DOUBLE;
 
-// stat        : if_stat                     {$$ = $1;}
-//             | for_stat                    {$$ = $1;}
-//             | while_stat                  {$$ = $1;}
-//             | print_stat                  {$$ = $1;}
-//             | condition                   {$$ = $1;}
-//             | asig                        {$$ = $1;}
-//             | NUMBER                      {$$ = $1;}
-//             | cont                        {$$ = $1;}
-//             | array                       {$$ = $1;}
-//             | matrix                      {$$ = $1;}
-//             | call_function               {$$ = $1;}
-//             | expr                        {$$ = $1;};
+stat: if_stat                     
+    | for_stat                    
+    | while_stat                  
+    | print_stat
+    | condition
+    | declare
+    | asig
+    | cont                        
+    | array                       
+    | matrix                      
+    | call_function               
+    | expr;
 
-// for_stat    : "for" '(' asig ';' condition ';' cont ')' '{' stat '}';
+for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF stat RF;
 
-// while_stat  : "while"'(' condition ')' '{'stat'}';
+while_stat: WHILE LG condition RG LF stat RF;
 
-// print_stat  : "print" '(' ID ')';
+print_stat: PRINT LG ID RG
+          | PRINT LG expr RG              {printf("%f\n", $3);};
 
-// condition   : (bool_cond | num_cond) (('&''&' | '|''|') condition)? ;
+condition: bool_cond AB AB condition
+         | bool_cond OB OB condition
+         | num_cond AB AB condition
+         | num_cond OB OB condition
+         | num_cond
+         | bool_cond;
 
-// bool_cond   : ID 
-//             | ID neq_eq (true | false);
+bool_cond: ID 
+         | ID neq_eq TRUE
+         | ID neq_eq FALSE;
 
-// neq_eq      : "==" 
-//             | "!=";
+neq_eq: EQ 
+      | NE;
 
-// num_cond    : ID oper NUMBER;
+num_cond: ID oper DOUBLE;
 
-// oper        : neq_eq                      
-//             | '<'                         
-//             | "<="                        
-//             | ">="                       
-//             | ">" ;                       
+oper: neq_eq                      
+    | LT                       
+    | LE
+    | GE
+    | GT;                       
 
+cont: ADD ADD ID
+    | SUB SUB ID
+    | ID ADD ADD
+    | ID SUB SUB;
 
-// cont        : '+''+'ID                   {$$ = ++ $3}
-//             | '-''-'ID                   {$$ = -- $3}
-//             | ID'+''+'                   {$$ = $1 ++}
-//             | ID'-''-'                   {$$ = $1 --};
+sec_num: DOUBLE COMMAN sec_num;
 
-// array       : '[' (NUMBER ',')* ']':
+array: LR sec_num RR
+     | LR RR;
 
-// matrix      : '[' (array',')* ']';
+sec_array: array COMMAN sec_array;
 
-// asig        : ID ( '[' NUMBER ']' ( '[' NUMBER ']' )? )? '=' (expr | array | matrix);
+matrix: LR sec_array RR;
 
-// function    : "fun" ID '(' ID* ')' '{' stat (RETURN (ID | NUMBER))? '}'
+declare: ID LR DOUBLE RR LR DOUBLE RR ASIG matrix 
+       | ID LR DOUBLE RR ASIG array
+       | ID ASIG expr;
 
-// call_function : ID '(' ID* ')' ;   
+asig: ID LR DOUBLE RR LR DOUBLE RR ASIG expr
+    | ID LR DOUBLE RR ASIG expr;
 
-// if_stat     : "if" '(' condition ')' '{' stat'}' ('else' '{'stat'}' )?;          
-// {if ($3 == true) {$$ = $6}}; 
+id_sec: ID COMMAN id_sec 
+      | /* empty */;
+
+function: FUN ID LG id_sec RG LF stat RETURN ID RF
+        | FUN ID LG id_sec RG LF stat RETURN DOUBLE RF
+        | FUN ID LG id_sec RG LF stat RF;
+
+call_function: ID LG id_sec RG ;   
+
+if_stat: IF LG condition RG LF stat RF ELSE LF stat RF
+       | IF LG condition RG LF stat RF;
 
 %%
 
