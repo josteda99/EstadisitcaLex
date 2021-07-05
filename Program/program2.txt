@@ -9,5 +9,6 @@ while(i <= n){
    a = b
    b = f
 }
-fibo = f
+print(4+5)
+//fibo = f
 

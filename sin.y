@@ -3,14 +3,16 @@
 #include <stdio.h>
 extern int yylex(void);
 int yyerror(char *s);
+FILE *yyin;
 %}
+
 %token IF ELSE ID DOUBLE
 %token FOR WHILE COM  BCOM 
 %token LT LE  EQ  NE  GT  GE 
 %token PRINT LG RG LR RR AB 
 %token OB ADD SUB MUL DIV POT 
 %token FALSE TRUE LF RF ASIG 
-%token RETURN ARITOP FUN
+%token RETURN ARITOP FUN 
 %token RELOP GROUP ARRAY BINOP 
 %token FUNCTION SEMICOLON COMMAN END
 %type <name> ID
@@ -35,7 +37,8 @@ int yyerror(char *s);
 prog: stmts;
 
 stmts: /* empty */
-     | stat stmts;
+     | stat END stmts
+     | END stmts ;
 
 expr: expr ADD expr               {$$ = $1 + $3;}
     | expr SUB expr               {$$ = $1 - $3;}
@@ -43,8 +46,18 @@ expr: expr ADD expr               {$$ = $1 + $3;}
     | expr DIV expr               {$$ = $1 / $3;}
     | expr POT expr               {$$ = pow($1, $3);}
     | LG expr RG                  {$$ = $2;}
-    | SUB expr  %prec UMINUS      {$$ = - $2;}
+    | SUB expr  %prec UMINUS      {$$ = - $2;} 
     | DOUBLE;
+
+expr_id: expr_id ADD expr_id               
+       | expr_id SUB expr_id               
+       | expr_id MUL expr_id               
+       | expr_id DIV expr_id               
+       | expr_id POT expr_id               
+       | LG expr_id RG                  
+       | SUB expr_id  %prec UMINUS     
+       | ID
+       | DOUBLE;
 
 stat: if_stat                     
     | for_stat                    
@@ -52,16 +65,17 @@ stat: if_stat
     | print_stat
     | condition
     | declare
-    | asig
-    | cont                        
-    | array                       
-    | matrix                      
+    | asig 
+    | cont                                              
     | call_function               
     | expr;
 
-for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF stat RF;
+bloque: stat END bloque 
+      | ;
 
-while_stat: WHILE LG condition RG LF stat RF;
+for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF END bloque RF;
+
+while_stat: WHILE LG condition RG LF END bloque RF;
 
 print_stat: PRINT LG ID RG
           | PRINT LG expr RG              {printf("%f\n", $3);};
@@ -71,16 +85,19 @@ condition: bool_cond AB AB condition
          | num_cond AB AB condition
          | num_cond OB OB condition
          | num_cond
-         | bool_cond;
+         | bool_cond
+         | TRUE;
 
 bool_cond: ID 
          | ID neq_eq TRUE
-         | ID neq_eq FALSE;
+         | ID neq_eq FALSE
+         | ID neq_eq ID;
 
 neq_eq: EQ 
       | NE;
 
-num_cond: ID oper DOUBLE;
+num_cond: ID oper DOUBLE
+        | ID oper ID;
 
 oper: neq_eq                      
     | LT                       
@@ -93,7 +110,8 @@ cont: ADD ADD ID
     | ID ADD ADD
     | ID SUB SUB;
 
-sec_num: DOUBLE COMMAN sec_num;
+sec_num: DOUBLE COMMAN sec_num
+       | DOUBLE; 
 
 array: LR sec_num RR
      | LR RR;
@@ -107,19 +125,23 @@ declare: ID LR DOUBLE RR LR DOUBLE RR ASIG matrix
        | ID ASIG expr;
 
 asig: ID LR DOUBLE RR LR DOUBLE RR ASIG expr
-    | ID LR DOUBLE RR ASIG expr;
+    | ID LR DOUBLE RR ASIG expr
+    | ID ASIG ID
+    | ID ASIG expr_id;
 
 id_sec: ID COMMAN id_sec 
-      | /* empty */;
+      | ID{printf("holandadsaf");}
+      | /* empty */          ;
 
-function: FUN ID LG id_sec RG LF stat RETURN ID RF
-        | FUN ID LG id_sec RG LF stat RETURN DOUBLE RF
-        | FUN ID LG id_sec RG LF stat RF;
+function: FUN ID LG id_sec RG LF END bloque RETURN expr_id RF
+        | FUN ID LG id_sec RG LF END bloque RETURN expr RF
+        | FUN ID LG id_sec RG LF END bloque RF;
 
-call_function: ID LG id_sec RG ;   
+call_function: ID LG id_sec RG 
+             | ID LG sec_num RG;   
 
-if_stat: IF LG condition RG LF stat RF ELSE LF stat RF
-       | IF LG condition RG LF stat RF;
+if_stat: IF LG condition RG LF END bloque RF ELSE LF END bloque RF
+       | IF LG condition RG LF END bloque RF;
 
 %%
 
@@ -129,7 +151,16 @@ int yyerror(char *s)
 	return 0;
 }
 
-int main() {
+int main(int argc, char *argv[ ] ) {
+   FILE *file;
+   if (argc == 2){
+		file = fopen(argv[1],"r");
+		if(!file){
+			fprintf(stderr, "could not open %s\n",argv[1]);
+			exit(1);
+		}
+		yyin = file;
+	}
     yyparse();
     return 0;
 }

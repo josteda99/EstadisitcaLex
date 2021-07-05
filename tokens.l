@@ -5,10 +5,9 @@
     #define YYSTYPE double
     int pointerID = 0;
     char *tableID[50];
-    int yywrap();
     void insertID();
 %}
-
+%option noyywrap
 /* regular definitions */
 delim       [ \t]
 ws          {delim}+
@@ -52,9 +51,10 @@ fun         {return FUN;}
 ";"         {return SEMICOLON;}
 ","         {return COMMAN;}
 "="         {return ASIG;}
-{com}       {return COM;}
+{com}       {}
 {double}    {yylval.real = atof(yytext); return DOUBLE;}
 {id}        {insertID(); return ID;}
+<<EOF>>     { static int once = 0; return (once = !once) ? END : 0; }
 "/*"        {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */
@@ -67,14 +67,14 @@ fun         {return FUN;}
                         /*error( "EOF in comment" );*/
                         break;
                     }
-                }; return BCOM;
+                }; 
             }
 "\n"        {return END;};
 %%
-int yywrap() {}
 
 void insertID() 
 { 
+   printf("chaolandsdfsfa");
     int i = 0;
     int inTable = 0;
     for(i = 0; i < pointerID; i++)
