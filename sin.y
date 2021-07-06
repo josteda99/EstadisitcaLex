@@ -38,7 +38,8 @@ prog: stmts;
 
 stmts: /* empty */
      | stat END stmts
-     | END stmts ;
+     | END stmts
+     | function END stmts ;
 
 expr: expr ADD expr               {$$ = $1 + $3;}
     | expr SUB expr               {$$ = $1 - $3;}
@@ -130,11 +131,12 @@ asig: ID LR DOUBLE RR LR DOUBLE RR ASIG expr
     | ID ASIG expr_id;
 
 id_sec: ID COMMAN id_sec 
-      | ID{printf("holandadsaf");}
+      | ID
       | /* empty */          ;
 
 function: FUN ID LG id_sec RG LF END bloque RETURN expr_id RF
         | FUN ID LG id_sec RG LF END bloque RETURN expr RF
+        | FUN ID LG id_sec RG LF END bloque RF
         | FUN ID LG id_sec RG LF END bloque RF;
 
 call_function: ID LG id_sec RG 
@@ -152,12 +154,11 @@ int yyerror(char *s)
 }
 
 int main(int argc, char *argv[ ] ) {
-   FILE *file;
-   if (argc == 2){
+    FILE *file;
+    if (argc == 2){
 		file = fopen(argv[1],"r");
 		if(!file){
 			fprintf(stderr, "could not open %s\n",argv[1]);
-			exit(1);
 		}
 		yyin = file;
 	}

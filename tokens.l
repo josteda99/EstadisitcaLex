@@ -74,7 +74,6 @@ fun         {return FUN;}
 
 void insertID() 
 { 
-   printf("chaolandsdfsfa");
     int i = 0;
     int inTable = 0;
     for(i = 0; i < pointerID; i++)
