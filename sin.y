@@ -1,28 +1,28 @@
 %{
 #include <math.h>
 #include <stdio.h>
-extern int yylex(void);
-int yyerror(char *s);
-FILE *yyin;
+#include "structs.h"
 %}
 
-%token IF ELSE ID DOUBLE
-%token FOR WHILE COM  BCOM 
+%token If ELSE ID NUMBER FOR WHILE PRINT FALSE TRUE RETURN FUN 
+
 %token LT LE  EQ  NE  GT  GE 
-%token PRINT LG RG LR RR AB 
+%token LG RG LR RR AB 
 %token OB ADD SUB MUL DIV POT 
-%token FALSE TRUE LF RF ASIG 
-%token RETURN ARITOP FUN 
-%token RELOP GROUP ARRAY BINOP 
-%token FUNCTION SEMICOLON COMMAN END
-%type <name> ID
-%type <real> DOUBLE
-%type <real> expr
+%token LF RF ASIG
+%token SEMICOLON COMMAN END
+
+%type <symbol> ID
+%type <d> NUMBER expr
 
 %union{
     char *name;
     int integer;
-    double real;
+    double d;
+    struct symbol *         // En caso de que la lectura halla sido de un simbolo
+
+    char type;              // Para saber si es Integer (i), Double (d), True (t), False (f)
+    bit 
 }
 
 %left ADD SUB
@@ -128,7 +128,7 @@ declare: ID LR DOUBLE RR LR DOUBLE RR ASIG matrix
 asig: ID LR DOUBLE RR LR DOUBLE RR ASIG expr
     | ID LR DOUBLE RR ASIG expr
     | ID ASIG ID
-    | ID ASIG expr_id;
+    | ID ASIG expr_id                       {};
 
 id_sec: ID COMMAN id_sec 
       | ID
@@ -146,22 +146,3 @@ if_stat: IF LG condition RG LF END bloque RF ELSE LF END bloque RF
        | IF LG condition RG LF END bloque RF;
 
 %%
-
-int yyerror(char *s)
-{
-	printf("Syntax Error on line %s\n", s);
-	return 0;
-}
-
-int main(int argc, char *argv[ ] ) {
-    FILE *file;
-    if (argc == 2){
-		file = fopen(argv[1],"r");
-		if(!file){
-			fprintf(stderr, "could not open %s\n",argv[1]);
-		}
-		yyin = file;
-	}
-    yyparse();
-    return 0;
-}

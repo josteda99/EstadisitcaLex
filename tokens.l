@@ -2,10 +2,8 @@
     #include <math.h>
     #include <string.h>
     #include "sin.tab.h"
+    #include "structs.h"
     #define YYSTYPE double
-    int pointerID = 0;
-    char *tableID[50];
-    void insertID();
 %}
 %option noyywrap
 /* regular definitions */
@@ -14,7 +12,8 @@ ws          {delim}+
 letter      [A-Za-z]
 digit       [0-9]
 id          {letter}({letter}|{digit})*
-double      {digit}+(\.{digit}+)?(E[+-]?{digit}+)?
+double      {digit}+(\.{digit}+)(E[+-]?{digit}+)?
+integer     {digit}+(E[+-]?{digit}+)?
 slash       "/"
 com         {slash}{slash}(ws|.)*\n
 %%
@@ -51,10 +50,9 @@ fun         {return FUN;}
 ";"         {return SEMICOLON;}
 ","         {return COMMAN;}
 "="         {return ASIG;}
-{com}       {}
-{double}    {yylval.real = atof(yytext); return DOUBLE;}
-{id}        {insertID(); return ID;}
-<<EOF>>     { static int once = 0; return (once = !once) ? END : 0; }
+{integer}   {yylval.typeC = 'i'; yylval.d = atof(yytext); return NUMBER;}
+{double}    {yylval.typeC = 'd'; yylval.d = atof(yytext); return NUMBER;}
+{id}        {yylval.symbol =  iSymbol(yytext); return ID;}
 "/*"        {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */
@@ -69,30 +67,8 @@ fun         {return FUN;}
                     }
                 }; 
             }
+{com}
 "\n"        {return END;};
 .           {yyerror("Unknow Character.\n");}
+<<EOF>>     {static int once = 0; return (once = !once) ? END : 0;}
 %%
-
-void insertID() 
-{ 
-    int i = 0;
-    int inTable = 0;
-    for(i = 0; i < pointerID; i++)
-    {
-        if(strcmp(tableID[i], yytext) == 0)
-        {
-            inTable = 1;
-            break;
-        }
-    }
-    if (i == pointerID) 
-    {
-        tableID[pointerID] = strdup(yytext);
-        yylval.name = strdup(yytext);
-        yylval.integer = pointerID++;
-    }else{
-        if(inTable == 1) {
-            yylval.integer = i;
-        }
-    }
-}
