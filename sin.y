@@ -152,8 +152,8 @@ int yyerror(char *s)
 }
 
 int main(int argc, char *argv[ ] ) {
-   FILE *file;
-   if (argc == 2){
+    FILE *file;
+    if (argc == 2){
 		file = fopen(argv[1],"r");
 		if(!file){
 			fprintf(stderr, "could not open %s\n",argv[1]);
