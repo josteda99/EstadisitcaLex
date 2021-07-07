@@ -115,6 +115,7 @@ declare: ID '[' NUMBER ']' '[' NUMBER ']' '=' matrix
        | ID '=' expr;
 
 asig: ID '[' NUMBER ']' '[' NUMBER ']' '=' expr
+    | ID '[' NUMBER ']' '[' NUMBER ']' '=' matrix
     | ID '[' NUMBER ']' '=' expr
     | ID '=' ID
     | ID '=' expr_id;
