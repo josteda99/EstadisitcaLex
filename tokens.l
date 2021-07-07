@@ -7,7 +7,7 @@
 %}
 %option noyywrap
 /* regular definitions */
-delim       [ \t]
+delim       [ \n\t]
 ws          {delim}+
 letter      [A-Za-z]
 digit       [0-9]
@@ -24,8 +24,8 @@ else        {return ELSE;}
 for         {return FOR;}
 while       {return WHILE;}
 print       {return PRINT;}
-false       {yylval.typeC = 'f'; return LOGIC;}
-true        {yylval.typeC = 't'; return LOGIC;}
+false       {yylval.typeC = 'F'; return LOGIC;}
+true        {yylval.typeC = 'T'; return LOGIC;}
 return      {return RETURN;}
 fun         {return FUN;}
 "<"         {yylval.loCmp = 1; return CMP;} 
@@ -50,8 +50,8 @@ fun         {return FUN;}
 ";" | 
 "," |
 "="         {return yytext[0];}
-{integer}   {yylval.typeC = 'i'; yylval.d = atof(yytext); return NUMBER;}
-{double}    {yylval.typeC = 'd'; yylval.d = atof(yytext); return NUMBER;}
+{integer}   {yylval.d = newNumber(atof(yytext), 'i'); return NUMBER;}
+{double}    {yylval.d = newNumber(atof(yytext), 'f'); return NUMBER;}
 {id}        {yylval.symbol =  iSymbol(yytext); return ID;}
 "/*"        {register int c;
                 for ( ; ; ) {
@@ -68,6 +68,5 @@ fun         {return FUN;}
                 }; 
             }
 {com}
-"\n"        {return END;};
 <<EOF>>     {static int once = 0; return (once = !once) ? END : 0;}
 %%

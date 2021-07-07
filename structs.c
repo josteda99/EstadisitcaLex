@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "structs.h"
 
 
@@ -37,6 +38,92 @@ struct symbol *iSymbol(char *character)
 	}
 	yyerror("Table symbol Overflow ocurred");
 	abort();
+}
+
+struct numValue *newNumber(double number, char typeC)
+{
+	struct numValue *n = malloc(sizeof(struct numValue));
+	if(!n)
+	{
+		yyerror("Out of memory");
+		exit(1);
+	}
+	n->num = number;
+	n->nodeType = 'N';
+	n->numType = typeC;
+	return n;
+}
+
+struct ast *newAst(int type, struct ast *left, struct ast *right)
+{
+	struct ast *tree = malloc(sizeof(struct ast));
+	if (!tree)
+	{
+		yyerror("Out of memory");
+		exit(1);
+	}
+	tree->nodeType = type;
+	tree->left = left;
+	tree->right = right;
+	return tree;
+}
+
+struct ast *callPrint(struct ast *left)
+{
+	struct printStruct *p = malloc(sizeof(struct printStruct));
+	if(!p) 
+	{
+		yyerror("Out of memory");
+		exit(1);
+	}
+	p->nodeType = 'P';
+	p->left = left;
+	return (struct ast *)p;
+}
+
+static double printStmt(struct printStruct *p);
+
+double evalStmt(struct ast *tree)
+{
+	double result;
+	switch (tree->nodeType)
+	{
+		case 'N':
+			result = ((struct numValue *)tree)->num;
+			break;
+		case '+':
+			result = evalStmt(tree->left) + evalStmt(tree->right);
+			break;
+		case '-':
+			result = evalStmt(tree->left) - evalStmt(tree->right);
+			break;
+		case '*':
+			result = evalStmt(tree->left) * evalStmt(tree->right);
+			break;
+		case '/':
+			result = evalStmt(tree->left) * evalStmt(tree->right);
+			break;
+		case '_':
+			result = pow(evalStmt(tree->left),evalStmt(tree->right));
+			break;
+		case 'M':
+			result = -evalStmt(tree->left);
+			break;
+		case 'P':
+			result = printStmt((struct printStruct *)tree);
+			break;
+		default:
+			printf("Internal Error :(\n");
+			break;
+	}
+	return result;
+}
+
+static double printStmt(struct printStruct *p)
+{
+	double result = evalStmt(p->left);
+	printf("%f\n", result);
+	return result;
 }
 
 void yyerror(char *s)

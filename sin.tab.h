@@ -72,13 +72,14 @@ union YYSTYPE
 {
 #line 14 "sin.y"
 
-    double d;               // Para el control de numeros
-    struct symbol *symbol;  // En caso de que la lectura halla sido de un simbolo
+    char typeC;                 // Para saber si es Integer (d), Double (f), True (T), False (F)
+    int loCmp;                  // Para categorizar los operadores comparativos CMP 
 
-    char typeC;             // Para saber si es Integer (i), Double (d), True (t), False (f)
-    int loCmp               // Para categorizar los operadores comparativos CMP 
+    struct numValue *d;
+    struct ast *tree;           // (Abstract Syntax Tree) ast
+    struct symbol *symbol;      // En caso de que la lectura halla sido de un simbolo
 
-#line 82 "sin.tab.h"
+#line 83 "sin.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

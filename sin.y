@@ -1,5 +1,4 @@
 %{
-#include <math.h>
 #include <stdio.h>
 #include "structs.h"
 %}
@@ -7,16 +6,18 @@
 %token IF ELSE ID NUMBER FOR WHILE PRINT RETURN FUN LOGIC
 %token POW END
 
-%type <symbol> ID
-%type <d> NUMBER expr
 %type <typeC> LOGIC
+%type <symbol> ID
+%type <d> NUMBER
+%type <tree> expr stat
 
 %union{
-    double d;               // Para el control de numeros
-    struct symbol *symbol;  // En caso de que la lectura halla sido de un simbolo
+    char typeC;                 // Para saber si es Integer (d), Double (f), True (T), False (F)
+    int loCmp;                  // Para categorizar los operadores comparativos CMP 
 
-    char typeC;             // Para saber si es Integer (i), Double (d), True (t), False (f)
-    int loCmp               // Para categorizar los operadores comparativos CMP 
+    struct numValue *d;
+    struct ast *tree;           // (Abstract Syntax Tree) ast
+    struct symbol *symbol;      // En caso de que la lectura halla sido de un simbolo
 };
 
 %nonassoc <loCmp> CMP       
@@ -38,52 +39,38 @@
 %start prog
 %%
 
-prog: stmts;
+prog: stmts END         {printf("Compiled Done ;)\n");};
 
 stmts: /* empty */
-     | stat END stmts
-     | END stmts
-     | function END stmts;
+     | stat stmts
+     | function stmts;
 
-expr: expr '+' expr               {$$ = $1 + $3;}
-    | expr '-' expr               {$$ = $1 - $3;}
-    | expr '*' expr               {$$ = $1 * $3;}
-    | expr '/' expr               {$$ = $1 / $3;}
-    | expr POW expr               {$$ = pow($1, $3);}
-    | '(' expr ')'                {$$ = $2;}
-    | '-' expr  %prec UMINUS      {$$ = - $2;} 
-    | NUMBER                      {$$ = $1;};
+expr: expr '+' expr                 {$$ = newAst('+', $1, $3);}
+    | expr '-' expr                 {$$ = newAst('-', $1, $3);}
+    | expr '*' expr                 {$$ = newAst('*', $1, $3);}
+    | expr '/' expr                 {$$ = newAst('/', $1, $3);}
+    | expr POW expr                 {$$ = newAst('_', $1, $3);}
+    | '(' expr ')'                  {$$ = $2;}
+    | '-' expr  %prec UMINUS        {$$ = newAst('M', $2, NULL);} 
+    | PRINT '(' expr ')'            {$$ = callPrint($3);}
+    | NUMBER                        {$$ = (struct ast *)$1;}
+    | ID                            {};
 
-expr_id: expr_id '+' expr_id
-       | expr_id '-' expr_id
-       | expr_id '*' expr_id
-       | expr_id '*' expr_id
-       | expr_id POW expr_id
-       | '(' expr_id ')'
-       | '-' expr_id  %prec UMINUS
-       | ID
-       | NUMBER;
+stat: if_stat            {}
+    | for_stat           {}
+    | while_stat         {}
+    | condition          {}
+    | declare            {}
+    | cont               {}
+    | call_function      {}
+    | expr               {evalStmt($1);};
 
-stat: if_stat
-    | for_stat
-    | while_stat
-    | print_stat
-    | condition
-    | declare
-    | asig
-    | cont
-    | call_function
-    | expr;
-
-bloque: stat END bloque
+bloque: stat bloque
       | /* empty */;
 
-for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' END bloque '}';
+for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' bloque '}';
 
-while_stat: WHILE '(' condition ')' '{' END bloque '}';
-
-print_stat: PRINT '(' ID ')'
-          | PRINT '(' expr ')'                  {printf("%f\n", $3);};
+while_stat: WHILE '(' condition ')' '{' bloque '}';
 
 condition: simple_condition '&' '&' condition
          | simple_condition '|' '|' condition
@@ -101,36 +88,31 @@ cont: '+' '+' ID
     | ID '-' '-';
 
 sec_num: NUMBER ',' sec_num
-       | NUMBER;
+       | NUMBER
+       | /* empty*/;
 
-array: '[' sec_num ']'
-     | '[' ']';
+array: '{' sec_num '}';
 
-sec_array: array ',' sec_array;
+sec_array: array ',' sec_array
+         | array;
 
-matrix: '[' sec_array ']';
+matrix: '{' sec_array '}';
 
-declare: ID '[' NUMBER ']' '[' NUMBER ']' '=' matrix
-       | ID '[' NUMBER ']' '=' array
+declare: ID '[' expr ']' '[' expr ']' '=' matrix
+       | ID '[' expr ']' '[' expr ']' '=' expr
+       | ID '[' expr ']' '=' array
        | ID '=' expr;
-
-asig: ID '[' NUMBER ']' '[' NUMBER ']' '=' expr
-    | ID '[' NUMBER ']' '=' expr
-    | ID '=' ID
-    | ID '=' expr_id;
 
 id_sec: ID ',' id_sec
       | ID
       | /* empty */;
 
-function: FUN ID '(' id_sec ')' '{' END bloque RETURN expr_id '}'
-        | FUN ID '(' id_sec ')' '{' END bloque RETURN expr '}'
-        | FUN ID '(' id_sec ')' '{' END bloque '}'
-        | FUN ID '(' id_sec ')' '{' END bloque '}';
+function: FUN ID '(' id_sec ')' '{' bloque RETURN expr '}'
+        | FUN ID '(' id_sec ')' '{' bloque '}';
 
 call_function: ID '(' id_sec ')'
              | ID '(' sec_num ')';
 
-if_stat: IF '(' condition ')' '{' END bloque '}' ELSE '{' END bloque '}'
-       | IF '(' condition ')' '{' END bloque '}';
+if_stat: IF '(' condition ')' '{' bloque '}' ELSE '{' bloque '}'
+       | IF '(' condition ')' '{' bloque '}';
 %%
