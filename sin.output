@@ -4,7 +4,7 @@ Estado 30 conflictos: 1 reducción/reducción
 Estado 71 conflictos: 14 reducción/reducción
 
 
-Gramática
+Grammar
 
     0 $accept: prog $end
 
@@ -86,7 +86,7 @@ Gramática
    58        | IF '(' condition ')' '{' bloque '}'
 
 
-Terminales con las reglas donde aparecen
+Terminals, with rules where they appear
 
     $end (0) 0
     '&' (38) 27
@@ -121,7 +121,7 @@ Terminales con las reglas donde aparecen
     UMINUS (271)
 
 
-No terminales con las reglas donde aparecen
+Nonterminals, with rules where they appear
 
     $accept (32)
         on left: 0
@@ -184,7 +184,7 @@ No terminales con las reglas donde aparecen
         on right: 15
 
 
-Estado 0
+State 0
 
     0 $accept: . prog $end
 
@@ -225,7 +225,7 @@ Estado 1
     '('  desplazar e ir al estado 25
 
 
-Estado 2
+State 2
 
    14 expr: ID .
    31 simple_condition: ID .
@@ -281,35 +281,35 @@ Estado 2
     $default  reduce usando la regla 14 (expr)
 
 
-Estado 3
+State 3
 
    13 expr: NUMBER .
 
-    $default  reduce usando la regla 13 (expr)
+    $default  reduce using rule 13 (expr)
 
 
-Estado 4
+State 4
 
    25 for_stat: FOR . '(' ID '=' expr ';' condition ';' cont ')' '{' bloque '}'
 
     '('  desplazar e ir al estado 32
 
 
-Estado 5
+State 5
 
    26 while_stat: WHILE . '(' condition ')' '{' bloque '}'
 
     '('  desplazar e ir al estado 33
 
 
-Estado 6
+State 6
 
    12 expr: PRINT . '(' expr ')'
 
     '('  desplazar e ir al estado 34
 
 
-Estado 7
+State 7
 
    53 function: FUN . ID '(' id_sec ')' '{' bloque RETURN expr '}'
    54         | FUN . ID '(' id_sec ')' '{' bloque '}'
@@ -317,14 +317,14 @@ Estado 7
     ID  desplazar e ir al estado 35
 
 
-Estado 8
+State 8
 
    30 condition: LOGIC .
 
     $default  reduce usando la regla 30 (condition)
 
 
-Estado 9
+State 9
 
    35 cont: '+' . '+' ID
 
@@ -345,7 +345,7 @@ Estado 10
     expr  ir al estado 39
 
 
-Estado 11
+State 11
 
    10 expr: '(' . expr ')'
 
@@ -358,21 +358,21 @@ Estado 11
     expr  ir al estado 41
 
 
-Estado 12
+State 12
 
     0 $accept: prog . $end
 
     $end  desplazar e ir al estado 42
 
 
-Estado 13
+State 13
 
     1 prog: stmts . END
 
     END  desplazar e ir al estado 43
 
 
-Estado 14
+State 14
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -392,7 +392,7 @@ Estado 14
     $default  reduce usando la regla 22 (stat)
 
 
-Estado 15
+State 15
 
     3 stmts: stat . stmts
 
@@ -424,28 +424,28 @@ Estado 15
     if_stat           ir al estado 24
 
 
-Estado 16
+State 16
 
    16 stat: for_stat .
 
     $default  reduce usando la regla 16 (stat)
 
 
-Estado 17
+State 17
 
    17 stat: while_stat .
 
     $default  reduce usando la regla 17 (stat)
 
 
-Estado 18
+State 18
 
    18 stat: condition .
 
     $default  reduce usando la regla 18 (stat)
 
 
-Estado 19
+State 19
 
    27 condition: simple_condition . '&' '&' condition
    28          | simple_condition . '|' '|' condition
@@ -457,21 +457,21 @@ Estado 19
     $default  reduce usando la regla 29 (condition)
 
 
-Estado 20
+State 20
 
    20 stat: cont .
 
     $default  reduce usando la regla 20 (stat)
 
 
-Estado 21
+State 21
 
    19 stat: declare .
 
     $default  reduce usando la regla 19 (stat)
 
 
-Estado 22
+State 22
 
     4 stmts: function . stmts
 
@@ -503,21 +503,21 @@ Estado 22
     if_stat           ir al estado 24
 
 
-Estado 23
+State 23
 
    21 stat: call_function .
 
     $default  reduce usando la regla 21 (stat)
 
 
-Estado 24
+State 24
 
    15 stat: if_stat .
 
     $default  reduce usando la regla 15 (stat)
 
 
-Estado 25
+State 25
 
    57 if_stat: IF '(' . condition ')' '{' bloque '}' ELSE '{' bloque '}'
    58        | IF '(' . condition ')' '{' bloque '}'
@@ -529,7 +529,7 @@ Estado 25
     simple_condition  ir al estado 19
 
 
-Estado 26
+State 26
 
    32 simple_condition: ID CMP . LOGIC
    33                 | ID CMP . NUMBER
@@ -540,7 +540,7 @@ Estado 26
     LOGIC   desplazar e ir al estado 57
 
 
-Estado 27
+State 27
 
    49 declare: ID '=' . expr
 
@@ -560,14 +560,14 @@ Estado 28
     '+'  desplazar e ir al estado 59
 
 
-Estado 29
+State 29
 
    38 cont: ID '-' . '-'
 
     '-'  desplazar e ir al estado 60
 
 
-Estado 30
+State 30
 
    55 call_function: ID '(' . id_sec ')'
    56              | ID '(' . sec_num ')'
@@ -583,7 +583,7 @@ Estado 30
     id_sec   ir al estado 64
 
 
-Estado 31
+State 31
 
    46 declare: ID '[' . expr ']' '[' expr ']' '=' matrix
    47        | ID '[' . expr ']' '[' expr ']' '=' expr
@@ -598,14 +598,14 @@ Estado 31
     expr  ir al estado 65
 
 
-Estado 32
+State 32
 
    25 for_stat: FOR '(' . ID '=' expr ';' condition ';' cont ')' '{' bloque '}'
 
     ID  desplazar e ir al estado 66
 
 
-Estado 33
+State 33
 
    26 while_stat: WHILE '(' . condition ')' '{' bloque '}'
 
@@ -616,7 +616,7 @@ Estado 33
     simple_condition  ir al estado 19
 
 
-Estado 34
+State 34
 
    12 expr: PRINT '(' . expr ')'
 
@@ -629,7 +629,7 @@ Estado 34
     expr  ir al estado 68
 
 
-Estado 35
+State 35
 
    53 function: FUN ID . '(' id_sec ')' '{' bloque RETURN expr '}'
    54         | FUN ID . '(' id_sec ')' '{' bloque '}'
@@ -637,21 +637,21 @@ Estado 35
     '('  desplazar e ir al estado 69
 
 
-Estado 36
+State 36
 
    35 cont: '+' '+' . ID
 
     ID  desplazar e ir al estado 70
 
 
-Estado 37
+State 37
 
    14 expr: ID .
 
     $default  reduce usando la regla 14 (expr)
 
 
-Estado 38
+State 38
 
    11 expr: '-' . expr
    36 cont: '-' '-' . ID
@@ -665,7 +665,7 @@ Estado 38
     expr  ir al estado 39
 
 
-Estado 39
+State 39
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -679,7 +679,7 @@ Estado 39
     $default  reduce usando la regla 11 (expr)
 
 
-Estado 40
+State 40
 
    11 expr: '-' . expr
 
@@ -692,7 +692,7 @@ Estado 40
     expr  ir al estado 39
 
 
-Estado 41
+State 41
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -709,21 +709,21 @@ Estado 41
     ')'  desplazar e ir al estado 72
 
 
-Estado 42
+State 42
 
     0 $accept: prog $end .
 
     $default  aceptar
 
 
-Estado 43
+State 43
 
     1 prog: stmts END .
 
     $default  reduce usando la regla 1 (prog)
 
 
-Estado 44
+State 44
 
     9 expr: expr POW . expr
 
@@ -736,7 +736,7 @@ Estado 44
     expr  ir al estado 73
 
 
-Estado 45
+State 45
 
     5 expr: expr '+' . expr
 
@@ -749,7 +749,7 @@ Estado 45
     expr  ir al estado 74
 
 
-Estado 46
+State 46
 
     6 expr: expr '-' . expr
 
@@ -762,7 +762,7 @@ Estado 46
     expr  ir al estado 75
 
 
-Estado 47
+State 47
 
     7 expr: expr '*' . expr
 
@@ -775,7 +775,7 @@ Estado 47
     expr  ir al estado 76
 
 
-Estado 48
+State 48
 
     8 expr: expr '/' . expr
 
@@ -788,21 +788,21 @@ Estado 48
     expr  ir al estado 77
 
 
-Estado 49
+State 49
 
     3 stmts: stat stmts .
 
     $default  reduce usando la regla 3 (stmts)
 
 
-Estado 50
+State 50
 
    27 condition: simple_condition '&' . '&' condition
 
     '&'  desplazar e ir al estado 78
 
 
-Estado 51
+State 51
 
    28 condition: simple_condition '|' . '|' condition
 
@@ -816,7 +816,7 @@ Estado 52
     $default  reduce usando la regla 4 (stmts)
 
 
-Estado 53
+State 53
 
    31 simple_condition: ID .
    32                 | ID . CMP LOGIC
@@ -843,21 +843,21 @@ Estado 55
     $default  reduce usando la regla 34 (simple_condition)
 
 
-Estado 56
+State 56
 
    33 simple_condition: ID CMP NUMBER .
 
     $default  reduce usando la regla 33 (simple_condition)
 
 
-Estado 57
+State 57
 
    32 simple_condition: ID CMP LOGIC .
 
     $default  reduce usando la regla 32 (simple_condition)
 
 
-Estado 58
+State 58
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -875,21 +875,21 @@ Estado 58
     $default  reduce usando la regla 49 (declare)
 
 
-Estado 59
+State 59
 
    37 cont: ID '+' '+' .
 
     $default  reduce usando la regla 37 (cont)
 
 
-Estado 60
+State 60
 
    38 cont: ID '-' '-' .
 
     $default  reduce usando la regla 38 (cont)
 
 
-Estado 61
+State 61
 
    50 id_sec: ID . ',' id_sec
    51       | ID .
@@ -909,21 +909,21 @@ Estado 62
     $default  reduce usando la regla 40 (sec_num)
 
 
-Estado 63
+State 63
 
    56 call_function: ID '(' sec_num . ')'
 
     ')'  desplazar e ir al estado 83
 
 
-Estado 64
+State 64
 
    55 call_function: ID '(' id_sec . ')'
 
     ')'  desplazar e ir al estado 84
 
 
-Estado 65
+State 65
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -942,21 +942,21 @@ Estado 65
     ']'  desplazar e ir al estado 85
 
 
-Estado 66
+State 66
 
    25 for_stat: FOR '(' ID . '=' expr ';' condition ';' cont ')' '{' bloque '}'
 
     '='  desplazar e ir al estado 86
 
 
-Estado 67
+State 67
 
    26 while_stat: WHILE '(' condition . ')' '{' bloque '}'
 
     ')'  desplazar e ir al estado 87
 
 
-Estado 68
+State 68
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -973,7 +973,7 @@ Estado 68
     ')'  desplazar e ir al estado 88
 
 
-Estado 69
+State 69
 
    53 function: FUN ID '(' . id_sec ')' '{' bloque RETURN expr '}'
    54         | FUN ID '(' . id_sec ')' '{' bloque '}'
@@ -985,14 +985,14 @@ Estado 69
     id_sec  ir al estado 89
 
 
-Estado 70
+State 70
 
    35 cont: '+' '+' ID .
 
     $default  reduce usando la regla 35 (cont)
 
 
-Estado 71
+State 71
 
    14 expr: ID .
    36 cont: '-' '-' ID .
@@ -1028,14 +1028,14 @@ Estado 71
     $default  reduce usando la regla 14 (expr)
 
 
-Estado 72
+State 72
 
    10 expr: '(' expr ')' .
 
     $default  reduce usando la regla 10 (expr)
 
 
-Estado 73
+State 73
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -1049,7 +1049,7 @@ Estado 73
     $default  reduce usando la regla 9 (expr)
 
 
-Estado 74
+State 74
 
     5 expr: expr . '+' expr
     5     | expr '+' expr .
@@ -1065,7 +1065,7 @@ Estado 74
     $default  reduce usando la regla 5 (expr)
 
 
-Estado 75
+State 75
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -1081,7 +1081,7 @@ Estado 75
     $default  reduce usando la regla 6 (expr)
 
 
-Estado 76
+State 76
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -1109,7 +1109,7 @@ Estado 77
     $default  reduce usando la regla 8 (expr)
 
 
-Estado 78
+State 78
 
    27 condition: simple_condition '&' '&' . condition
 
@@ -1120,7 +1120,7 @@ Estado 78
     simple_condition  ir al estado 19
 
 
-Estado 79
+State 79
 
    28 condition: simple_condition '|' '|' . condition
 
@@ -1131,7 +1131,7 @@ Estado 79
     simple_condition  ir al estado 19
 
 
-Estado 80
+State 80
 
    57 if_stat: IF '(' condition ')' . '{' bloque '}' ELSE '{' bloque '}'
    58        | IF '(' condition ')' . '{' bloque '}'
@@ -1139,7 +1139,7 @@ Estado 80
     '{'  desplazar e ir al estado 92
 
 
-Estado 81
+State 81
 
    50 id_sec: ID ',' . id_sec
 
@@ -1150,7 +1150,7 @@ Estado 81
     id_sec  ir al estado 93
 
 
-Estado 82
+State 82
 
    39 sec_num: NUMBER ',' . sec_num
 
@@ -1161,21 +1161,21 @@ Estado 82
     sec_num  ir al estado 94
 
 
-Estado 83
+State 83
 
    56 call_function: ID '(' sec_num ')' .
 
     $default  reduce usando la regla 56 (call_function)
 
 
-Estado 84
+State 84
 
    55 call_function: ID '(' id_sec ')' .
 
     $default  reduce usando la regla 55 (call_function)
 
 
-Estado 85
+State 85
 
    46 declare: ID '[' expr ']' . '[' expr ']' '=' matrix
    47        | ID '[' expr ']' . '[' expr ']' '=' expr
@@ -1185,7 +1185,7 @@ Estado 85
     '['  desplazar e ir al estado 96
 
 
-Estado 86
+State 86
 
    25 for_stat: FOR '(' ID '=' . expr ';' condition ';' cont ')' '{' bloque '}'
 
@@ -1205,14 +1205,14 @@ Estado 87
     '{'  desplazar e ir al estado 98
 
 
-Estado 88
+State 88
 
    12 expr: PRINT '(' expr ')' .
 
     $default  reduce usando la regla 12 (expr)
 
 
-Estado 89
+State 89
 
    53 function: FUN ID '(' id_sec . ')' '{' bloque RETURN expr '}'
    54         | FUN ID '(' id_sec . ')' '{' bloque '}'
@@ -1220,21 +1220,21 @@ Estado 89
     ')'  desplazar e ir al estado 99
 
 
-Estado 90
+State 90
 
    27 condition: simple_condition '&' '&' condition .
 
     $default  reduce usando la regla 27 (condition)
 
 
-Estado 91
+State 91
 
    28 condition: simple_condition '|' '|' condition .
 
     $default  reduce usando la regla 28 (condition)
 
 
-Estado 92
+State 92
 
    57 if_stat: IF '(' condition ')' '{' . bloque '}' ELSE '{' bloque '}'
    58        | IF '(' condition ')' '{' . bloque '}'
@@ -1265,21 +1265,21 @@ Estado 92
     if_stat           ir al estado 24
 
 
-Estado 93
+State 93
 
    50 id_sec: ID ',' id_sec .
 
     $default  reduce usando la regla 50 (id_sec)
 
 
-Estado 94
+State 94
 
    39 sec_num: NUMBER ',' sec_num .
 
     $default  reduce usando la regla 39 (sec_num)
 
 
-Estado 95
+State 95
 
    48 declare: ID '[' expr ']' '=' . array
 
@@ -1288,7 +1288,7 @@ Estado 95
     array  ir al estado 103
 
 
-Estado 96
+State 96
 
    46 declare: ID '[' expr ']' '[' . expr ']' '=' matrix
    47        | ID '[' expr ']' '[' . expr ']' '=' expr
@@ -1302,7 +1302,7 @@ Estado 96
     expr  ir al estado 104
 
 
-Estado 97
+State 97
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -1319,7 +1319,7 @@ Estado 97
     ';'  desplazar e ir al estado 105
 
 
-Estado 98
+State 98
 
    26 while_stat: WHILE '(' condition ')' '{' . bloque '}'
 
@@ -1349,7 +1349,7 @@ Estado 98
     if_stat           ir al estado 24
 
 
-Estado 99
+State 99
 
    53 function: FUN ID '(' id_sec ')' . '{' bloque RETURN expr '}'
    54         | FUN ID '(' id_sec ')' . '{' bloque '}'
@@ -1357,7 +1357,7 @@ Estado 99
     '{'  desplazar e ir al estado 107
 
 
-Estado 100
+State 100
 
    23 bloque: stat . bloque
 
@@ -1387,7 +1387,7 @@ Estado 100
     if_stat           ir al estado 24
 
 
-Estado 101
+State 101
 
    57 if_stat: IF '(' condition ')' '{' bloque . '}' ELSE '{' bloque '}'
    58        | IF '(' condition ')' '{' bloque . '}'
@@ -1395,7 +1395,7 @@ Estado 101
     '}'  desplazar e ir al estado 109
 
 
-Estado 102
+State 102
 
    42 array: '{' . sec_num '}'
 
@@ -1413,7 +1413,7 @@ Estado 103
     $default  reduce usando la regla 48 (declare)
 
 
-Estado 104
+State 104
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -1431,7 +1431,7 @@ Estado 104
     ']'  desplazar e ir al estado 111
 
 
-Estado 105
+State 105
 
    25 for_stat: FOR '(' ID '=' expr ';' . condition ';' cont ')' '{' bloque '}'
 
@@ -1442,14 +1442,14 @@ Estado 105
     simple_condition  ir al estado 19
 
 
-Estado 106
+State 106
 
    26 while_stat: WHILE '(' condition ')' '{' bloque . '}'
 
     '}'  desplazar e ir al estado 113
 
 
-Estado 107
+State 107
 
    53 function: FUN ID '(' id_sec ')' '{' . bloque RETURN expr '}'
    54         | FUN ID '(' id_sec ')' '{' . bloque '}'
@@ -1480,14 +1480,14 @@ Estado 107
     if_stat           ir al estado 24
 
 
-Estado 108
+State 108
 
    23 bloque: stat bloque .
 
     $default  reduce usando la regla 23 (bloque)
 
 
-Estado 109
+State 109
 
    57 if_stat: IF '(' condition ')' '{' bloque '}' . ELSE '{' bloque '}'
    58        | IF '(' condition ')' '{' bloque '}' .
@@ -1497,14 +1497,14 @@ Estado 109
     $default  reduce usando la regla 58 (if_stat)
 
 
-Estado 110
+State 110
 
    42 array: '{' sec_num . '}'
 
     '}'  desplazar e ir al estado 116
 
 
-Estado 111
+State 111
 
    46 declare: ID '[' expr ']' '[' expr ']' . '=' matrix
    47        | ID '[' expr ']' '[' expr ']' . '=' expr
@@ -1512,21 +1512,21 @@ Estado 111
     '='  desplazar e ir al estado 117
 
 
-Estado 112
+State 112
 
    25 for_stat: FOR '(' ID '=' expr ';' condition . ';' cont ')' '{' bloque '}'
 
     ';'  desplazar e ir al estado 118
 
 
-Estado 113
+State 113
 
    26 while_stat: WHILE '(' condition ')' '{' bloque '}' .
 
     $default  reduce usando la regla 26 (while_stat)
 
 
-Estado 114
+State 114
 
    53 function: FUN ID '(' id_sec ')' '{' bloque . RETURN expr '}'
    54         | FUN ID '(' id_sec ')' '{' bloque . '}'
@@ -1535,21 +1535,21 @@ Estado 114
     '}'     desplazar e ir al estado 120
 
 
-Estado 115
+State 115
 
    57 if_stat: IF '(' condition ')' '{' bloque '}' ELSE . '{' bloque '}'
 
     '{'  desplazar e ir al estado 121
 
 
-Estado 116
+State 116
 
    42 array: '{' sec_num '}' .
 
     $default  reduce usando la regla 42 (array)
 
 
-Estado 117
+State 117
 
    46 declare: ID '[' expr ']' '[' expr ']' '=' . matrix
    47        | ID '[' expr ']' '[' expr ']' '=' . expr
@@ -1565,7 +1565,7 @@ Estado 117
     matrix  ir al estado 124
 
 
-Estado 118
+State 118
 
    25 for_stat: FOR '(' ID '=' expr ';' condition ';' . cont ')' '{' bloque '}'
 
@@ -1576,7 +1576,7 @@ Estado 118
     cont  ir al estado 127
 
 
-Estado 119
+State 119
 
    53 function: FUN ID '(' id_sec ')' '{' bloque RETURN . expr '}'
 
@@ -1589,14 +1589,14 @@ Estado 119
     expr  ir al estado 128
 
 
-Estado 120
+State 120
 
    54 function: FUN ID '(' id_sec ')' '{' bloque '}' .
 
     $default  reduce usando la regla 54 (function)
 
 
-Estado 121
+State 121
 
    57 if_stat: IF '(' condition ')' '{' bloque '}' ELSE '{' . bloque '}'
 
@@ -1626,7 +1626,7 @@ Estado 121
     if_stat           ir al estado 24
 
 
-Estado 122
+State 122
 
    45 matrix: '{' . sec_array '}'
 
@@ -1636,7 +1636,7 @@ Estado 122
     sec_array  ir al estado 131
 
 
-Estado 123
+State 123
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -1654,14 +1654,14 @@ Estado 123
     $default  reduce usando la regla 47 (declare)
 
 
-Estado 124
+State 124
 
    46 declare: ID '[' expr ']' '[' expr ']' '=' matrix .
 
     $default  reduce usando la regla 46 (declare)
 
 
-Estado 125
+State 125
 
    37 cont: ID . '+' '+'
    38     | ID . '-' '-'
@@ -1670,7 +1670,7 @@ Estado 125
     '-'  desplazar e ir al estado 29
 
 
-Estado 126
+State 126
 
    36 cont: '-' . '-' ID
 
@@ -1684,7 +1684,7 @@ Estado 127
     ')'  desplazar e ir al estado 133
 
 
-Estado 128
+State 128
 
     5 expr: expr . '+' expr
     6     | expr . '-' expr
@@ -1701,14 +1701,14 @@ Estado 128
     '}'  desplazar e ir al estado 134
 
 
-Estado 129
+State 129
 
    57 if_stat: IF '(' condition ')' '{' bloque '}' ELSE '{' bloque . '}'
 
     '}'  desplazar e ir al estado 135
 
 
-Estado 130
+State 130
 
    43 sec_array: array . ',' sec_array
    44          | array .
@@ -1725,7 +1725,7 @@ Estado 131
     '}'  desplazar e ir al estado 137
 
 
-Estado 132
+State 132
 
    36 cont: '-' '-' . ID
 
@@ -1739,21 +1739,21 @@ Estado 133
     '{'  desplazar e ir al estado 139
 
 
-Estado 134
+State 134
 
    53 function: FUN ID '(' id_sec ')' '{' bloque RETURN expr '}' .
 
     $default  reduce usando la regla 53 (function)
 
 
-Estado 135
+State 135
 
    57 if_stat: IF '(' condition ')' '{' bloque '}' ELSE '{' bloque '}' .
 
     $default  reduce usando la regla 57 (if_stat)
 
 
-Estado 136
+State 136
 
    43 sec_array: array ',' . sec_array
 
@@ -1763,21 +1763,21 @@ Estado 136
     sec_array  ir al estado 140
 
 
-Estado 137
+State 137
 
    45 matrix: '{' sec_array '}' .
 
     $default  reduce usando la regla 45 (matrix)
 
 
-Estado 138
+State 138
 
    36 cont: '-' '-' ID .
 
     $default  reduce usando la regla 36 (cont)
 
 
-Estado 139
+State 139
 
    25 for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' . bloque '}'
 
