@@ -52,46 +52,17 @@ extern int yydebug;
     IF = 258,
     ELSE = 259,
     ID = 260,
-    DOUBLE = 261,
+    NUMBER = 261,
     FOR = 262,
     WHILE = 263,
-    COM = 264,
-    BCOM = 265,
-    LT = 266,
-    LE = 267,
-    EQ = 268,
-    NE = 269,
-    GT = 270,
-    GE = 271,
-    PRINT = 272,
-    LG = 273,
-    RG = 274,
-    LR = 275,
-    RR = 276,
-    AB = 277,
-    OB = 278,
-    ADD = 279,
-    SUB = 280,
-    MUL = 281,
-    DIV = 282,
-    POT = 283,
-    FALSE = 284,
-    TRUE = 285,
-    LF = 286,
-    RF = 287,
-    ASIG = 288,
-    RETURN = 289,
-    ARITOP = 290,
-    FUN = 291,
-    RELOP = 292,
-    GROUP = 293,
-    ARRAY = 294,
-    BINOP = 295,
-    FUNCTION = 296,
-    SEMICOLON = 297,
-    COMMAN = 298,
-    END = 299,
-    UMINUS = 300
+    PRINT = 264,
+    RETURN = 265,
+    FUN = 266,
+    LOGIC = 267,
+    POW = 268,
+    END = 269,
+    CMP = 270,
+    UMINUS = 271
   };
 #endif
 
@@ -99,13 +70,15 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "sin.y"
+#line 14 "sin.y"
 
-    char *name;
-    int integer;
-    double real;
+    double d;               // Para el control de numeros
+    struct symbol *symbol;  // En caso de que la lectura halla sido de un simbolo
 
-#line 109 "sin.tab.h"
+    char typeC;             // Para saber si es Integer (i), Double (d), True (t), False (f)
+    int loCmp               // Para categorizar los operadores comparativos CMP 
+
+#line 82 "sin.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

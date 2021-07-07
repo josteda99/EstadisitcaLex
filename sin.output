@@ -1,44 +1,34 @@
-Nonterminals useless in grammar
+No terminales inútiles en la gramática
 
     sec_array
     matrix
 
 
-Terminals unused in grammar
+Reglas inútiles en la gramática
 
-    COM
-    BCOM
-    ARITOP
-    RELOP
-    GROUP
-    ARRAY
-    BINOP
-    FUNCTION
+   72 sec_array: array ',' sec_array
+
+   73 matrix: '[' sec_array ']'
+
+   74 declare: ID '[' NUMBER ']' '[' NUMBER ']' '=' matrix
 
 
-Rules useless in grammar
+La regla es inútil debido a los conflictos
 
-   84 sec_array: array COMMAN sec_array
+   17 expr_id: expr_id '*' expr_id
 
-   85 matrix: LR sec_array RR
+   59 asig: ID '=' ID
 
-   86 declare: ID LR DOUBLE RR LR DOUBLE RR ASIG matrix
-
-
-Rules useless in parser due to conflicts
-
-   71 asig: ID ASIG ID
-
-   79 function: FUN ID LG id_sec RG LF END bloque RF
+   67 function: FUN ID '(' id_sec ')' '{' END bloque '}'
 
 
-State 41 conflicts: 1 shift/reduce
-State 74 conflicts: 2 reduce/reduce
-State 75 conflicts: 8 reduce/reduce
-State 180 conflicts: 1 reduce/reduce
+Estado 60 conflictos: 1 reducción/reducción
+Estado 61 conflictos: 7 reducción/reducción
+Estado 118 conflictos: 6 reducción/reducción
+Estado 156 conflictos: 1 reducción/reducción
 
 
-Grammar
+Gramática
 
     0 $accept: prog $end
 
@@ -49,24 +39,24 @@ Grammar
     4      | END stmts
     5      | function END stmts
 
-    6 expr: expr ADD expr
-    7     | expr SUB expr
-    8     | expr MUL expr
-    9     | expr DIV expr
-   10     | expr POT expr
-   11     | LG expr RG
-   12     | SUB expr
-   13     | DOUBLE
+    6 expr: expr '+' expr
+    7     | expr '-' expr
+    8     | expr '*' expr
+    9     | expr '/' expr
+   10     | expr POW expr
+   11     | '(' expr ')'
+   12     | '-' expr
+   13     | NUMBER
 
-   14 expr_id: expr_id ADD expr_id
-   15        | expr_id SUB expr_id
-   16        | expr_id MUL expr_id
-   17        | expr_id DIV expr_id
-   18        | expr_id POT expr_id
-   19        | LG expr_id RG
-   20        | SUB expr_id
+   14 expr_id: expr_id '+' expr_id
+   15        | expr_id '-' expr_id
+   16        | expr_id '*' expr_id
+   17        | expr_id '*' expr_id
+   18        | expr_id POW expr_id
+   19        | '(' expr_id ')'
+   20        | '-' expr_id
    21        | ID
-   22        | DOUBLE
+   22        | NUMBER
 
    23 stat: if_stat
    24     | for_stat
@@ -82,2350 +72,2093 @@ Grammar
    33 bloque: stat END bloque
    34       | %empty
 
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF END bloque RF
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' END bloque '}'
 
-   36 while_stat: WHILE LG condition RG LF END bloque RF
+   36 while_stat: WHILE '(' condition ')' '{' END bloque '}'
 
-   37 print_stat: PRINT LG ID RG
-   38           | PRINT LG expr RG
+   37 print_stat: PRINT '(' ID ')'
+   38           | PRINT '(' expr ')'
 
-   39 condition: bool_cond AB AB condition
-   40          | bool_cond OB OB condition
-   41          | num_cond AB AB condition
-   42          | num_cond OB OB condition
-   43          | num_cond
-   44          | bool_cond
-   45          | TRUE
+   39 condition: simple_condition '&' '&' condition
+   40          | simple_condition '|' '|' condition
+   41          | simple_condition
+   42          | LOGIC
 
-   46 bool_cond: ID
-   47          | ID neq_eq TRUE
-   48          | ID neq_eq FALSE
-   49          | ID neq_eq ID
+   43 simple_condition: ID
+   44                 | ID CMP LOGIC
+   45                 | ID CMP NUMBER
+   46                 | ID CMP ID
 
-   50 neq_eq: EQ
-   51       | NE
+   47 cont: '+' '+' ID
+   48     | '-' '-' ID
+   49     | ID '+' '+'
+   50     | ID '-' '-'
 
-   52 num_cond: ID oper DOUBLE
-   53         | ID oper ID
+   51 sec_num: NUMBER ',' sec_num
+   52        | NUMBER
 
-   54 oper: neq_eq
-   55     | LT
-   56     | LE
-   57     | GE
-   58     | GT
+   53 array: '[' sec_num ']'
+   54      | '[' ']'
 
-   59 cont: ADD ADD ID
-   60     | SUB SUB ID
-   61     | ID ADD ADD
-   62     | ID SUB SUB
+   55 declare: ID '[' NUMBER ']' '=' array
+   56        | ID '=' expr
 
-   63 sec_num: DOUBLE COMMAN sec_num
-   64        | DOUBLE
+   57 asig: ID '[' NUMBER ']' '[' NUMBER ']' '=' expr
+   58     | ID '[' NUMBER ']' '=' expr
+   59     | ID '=' ID
+   60     | ID '=' expr_id
 
-   65 array: LR sec_num RR
-   66      | LR RR
+   61 id_sec: ID ',' id_sec
+   62       | ID
+   63       | %empty
 
-   67 declare: ID LR DOUBLE RR ASIG array
-   68        | ID ASIG expr
+   64 function: FUN ID '(' id_sec ')' '{' END bloque RETURN expr_id '}'
+   65         | FUN ID '(' id_sec ')' '{' END bloque RETURN expr '}'
+   66         | FUN ID '(' id_sec ')' '{' END bloque '}'
+   67         | FUN ID '(' id_sec ')' '{' END bloque '}'
 
-   69 asig: ID LR DOUBLE RR LR DOUBLE RR ASIG expr
-   70     | ID LR DOUBLE RR ASIG expr
-   71     | ID ASIG ID
-   72     | ID ASIG expr_id
+   68 call_function: ID '(' id_sec ')'
+   69              | ID '(' sec_num ')'
 
-   73 id_sec: ID COMMAN id_sec
-   74       | ID
-   75       | %empty
-
-   76 function: FUN ID LG id_sec RG LF END bloque RETURN expr_id RF
-   77         | FUN ID LG id_sec RG LF END bloque RETURN expr RF
-   78         | FUN ID LG id_sec RG LF END bloque RF
-   79         | FUN ID LG id_sec RG LF END bloque RF
-
-   80 call_function: ID LG id_sec RG
-   81              | ID LG sec_num RG
-
-   82 if_stat: IF LG condition RG LF END bloque RF ELSE LF END bloque RF
-   83        | IF LG condition RG LF END bloque RF
+   70 if_stat: IF '(' condition ')' '{' END bloque '}' ELSE '{' END bloque '}'
+   71        | IF '(' condition ')' '{' END bloque '}'
 
 
-Terminals, with rules where they appear
+Terminales con las reglas donde aparecen
 
     $end (0) 0
+    '&' (38) 39
+    '(' (40) 11 19 35 36 37 38 64 65 66 67 68 69 70 71
+    ')' (41) 11 19 35 36 37 38 64 65 66 67 68 69 70 71
+    '*' (42) 8 16 17
+    '+' (43) 6 14 47 49
+    ',' (44) 51 61
+    '-' (45) 7 12 15 20 48 50
+    '/' (47) 9
+    ';' (59) 35
+    '=' (61) 35 55 56 57 58 59 60
+    '[' (91) 53 54 55 57 58
+    ']' (93) 53 54 55 57 58
+    '{' (123) 35 36 64 65 66 67 70 71
+    '|' (124) 40
+    '}' (125) 35 36 64 65 66 67 70 71
     error (256)
-    IF (258) 82 83
-    ELSE (259) 82
-    ID <name> (260) 21 37 46 47 48 49 52 53 59 60 61 62 67 68 69 70 71 72 73 74 76 77 78 79 80 81
-    DOUBLE <real> (261) 13 22 52 63 64 67 69 70
+    IF (258) 70 71
+    ELSE (259) 70
+    ID <symbol> (260) 21 35 37 43 44 45 46 47 48 49 50 55 56 57 58 59 60 61 62 64 65 66 67 68 69
+    NUMBER <d> (261) 13 22 45 51 52 55 57 58
     FOR (262) 35
     WHILE (263) 36
-    COM (264)
-    BCOM (265)
-    LT (266) 55
-    LE (267) 56
-    EQ (268) 50
-    NE (269) 51
-    GT (270) 58
-    GE (271) 57
-    PRINT (272) 37 38
-    LG (273) 11 19 35 36 37 38 76 77 78 79 80 81 82 83
-    RG (274) 11 19 35 36 37 38 76 77 78 79 80 81 82 83
-    LR (275) 65 66 67 69 70
-    RR (276) 65 66 67 69 70
-    AB (277) 39 41
-    OB (278) 40 42
-    ADD (279) 6 14 59 61
-    SUB (280) 7 12 15 20 60 62
-    MUL (281) 8 16
-    DIV (282) 9 17
-    POT (283) 10 18
-    FALSE (284) 48
-    TRUE (285) 45 47
-    LF (286) 35 36 76 77 78 79 82 83
-    RF (287) 35 36 76 77 78 79 82 83
-    ASIG (288) 67 68 69 70 71 72
-    RETURN (289) 76 77
-    ARITOP (290)
-    FUN (291) 76 77 78 79
-    RELOP (292)
-    GROUP (293)
-    ARRAY (294)
-    BINOP (295)
-    FUNCTION (296)
-    SEMICOLON (297) 35
-    COMMAN (298) 63 73
-    END (299) 3 4 5 33 35 36 76 77 78 79 82 83
-    UMINUS (300)
+    PRINT (264) 37 38
+    RETURN (265) 64 65
+    FUN (266) 64 65 66 67
+    LOGIC <typeC> (267) 42 44
+    POW (268) 10 18
+    END (269) 3 4 5 33 35 36 64 65 66 67 70 71
+    CMP <loCmp> (270) 44 45 46
+    UMINUS (271)
 
 
-Nonterminals, with rules where they appear
+No terminales con las reglas donde aparecen
 
-    $accept (46)
+    $accept (32)
         on left: 0
-    prog (47)
+    prog (33)
         on left: 1
         on right: 0
-    stmts (48)
+    stmts (34)
         on left: 2 3 4 5
         on right: 1 3 4 5
-    expr <real> (49)
+    expr <d> (35)
         on left: 6 7 8 9 10 11 12 13
-        on right: 6 7 8 9 10 11 12 32 38 68 69 70 77
-    expr_id (50)
+        on right: 6 7 8 9 10 11 12 32 35 38 56 57 58 65
+    expr_id (36)
         on left: 14 15 16 17 18 19 20 21 22
-        on right: 14 15 16 17 18 19 20 72 76
-    stat (51)
+        on right: 14 15 16 17 18 19 20 60 64
+    stat (37)
         on left: 23 24 25 26 27 28 29 30 31 32
         on right: 3 33
-    bloque (52)
+    bloque (38)
         on left: 33 34
-        on right: 33 35 36 76 77 78 79 82 83
-    for_stat (53)
+        on right: 33 35 36 64 65 66 67 70 71
+    for_stat (39)
         on left: 35
         on right: 24
-    while_stat (54)
+    while_stat (40)
         on left: 36
         on right: 25
-    print_stat (55)
+    print_stat (41)
         on left: 37 38
         on right: 26
-    condition (56)
-        on left: 39 40 41 42 43 44 45
-        on right: 27 35 36 39 40 41 42 82 83
-    bool_cond (57)
-        on left: 46 47 48 49
-        on right: 39 40 44
-    neq_eq (58)
-        on left: 50 51
-        on right: 47 48 49 54
-    num_cond (59)
-        on left: 52 53
-        on right: 41 42 43
-    oper (60)
-        on left: 54 55 56 57 58
-        on right: 52 53
-    cont (61)
-        on left: 59 60 61 62
+    condition (42)
+        on left: 39 40 41 42
+        on right: 27 35 36 39 40 70 71
+    simple_condition (43)
+        on left: 43 44 45 46
+        on right: 39 40 41
+    cont (44)
+        on left: 47 48 49 50
         on right: 30 35
-    sec_num (62)
-        on left: 63 64
-        on right: 63 65 81
-    array (63)
-        on left: 65 66
-        on right: 67
-    declare (64)
-        on left: 67 68
+    sec_num (45)
+        on left: 51 52
+        on right: 51 53 69
+    array (46)
+        on left: 53 54
+        on right: 55
+    declare (47)
+        on left: 55 56
         on right: 28
-    asig (65)
-        on left: 69 70 71 72
-        on right: 29 35
-    id_sec (66)
-        on left: 73 74 75
-        on right: 73 76 77 78 79 80
-    function (67)
-        on left: 76 77 78 79
+    asig (48)
+        on left: 57 58 59 60
+        on right: 29
+    id_sec (49)
+        on left: 61 62 63
+        on right: 61 64 65 66 67 68
+    function (50)
+        on left: 64 65 66 67
         on right: 5
-    call_function (68)
-        on left: 80 81
+    call_function (51)
+        on left: 68 69
         on right: 31
-    if_stat (69)
-        on left: 82 83
+    if_stat (52)
+        on left: 70 71
         on right: 23
 
 
-State 0
+Estado 0
 
     0 $accept: . prog $end
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
-    FUN     shift, and go to state 11
-    END     shift, and go to state 12
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    FUN     desplazar e ir al estado 7
+    LOGIC   desplazar e ir al estado 8
+    END     desplazar e ir al estado 9
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
-    $default  reduce using rule 2 (stmts)
+    $default  reduce usando la regla 2 (stmts)
 
-    prog           go to state 13
-    stmts          go to state 14
-    expr           go to state 15
-    stat           go to state 16
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    function       go to state 26
-    call_function  go to state 27
-    if_stat        go to state 28
-
-
-State 1
-
-   82 if_stat: IF . LG condition RG LF END bloque RF ELSE LF END bloque RF
-   83        | IF . LG condition RG LF END bloque RF
-
-    LG  shift, and go to state 29
+    prog              ir al estado 13
+    stmts             ir al estado 14
+    expr              ir al estado 15
+    stat              ir al estado 16
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    function          ir al estado 25
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
 
-State 2
+Estado 1
 
-   46 bool_cond: ID .
-   47          | ID . neq_eq TRUE
-   48          | ID . neq_eq FALSE
-   49          | ID . neq_eq ID
-   52 num_cond: ID . oper DOUBLE
-   53         | ID . oper ID
-   61 cont: ID . ADD ADD
-   62     | ID . SUB SUB
-   67 declare: ID . LR DOUBLE RR ASIG array
-   68        | ID . ASIG expr
-   69 asig: ID . LR DOUBLE RR LR DOUBLE RR ASIG expr
-   70     | ID . LR DOUBLE RR ASIG expr
-   71     | ID . ASIG ID
-   72     | ID . ASIG expr_id
-   80 call_function: ID . LG id_sec RG
-   81              | ID . LG sec_num RG
+   70 if_stat: IF . '(' condition ')' '{' END bloque '}' ELSE '{' END bloque '}'
+   71        | IF . '(' condition ')' '{' END bloque '}'
 
-    LT    shift, and go to state 30
-    LE    shift, and go to state 31
-    EQ    shift, and go to state 32
-    NE    shift, and go to state 33
-    GT    shift, and go to state 34
-    GE    shift, and go to state 35
-    LG    shift, and go to state 36
-    LR    shift, and go to state 37
-    ADD   shift, and go to state 38
-    SUB   shift, and go to state 39
-    ASIG  shift, and go to state 40
-
-    $default  reduce using rule 46 (bool_cond)
-
-    neq_eq  go to state 41
-    oper    go to state 42
+    '('  desplazar e ir al estado 28
 
 
-State 3
+Estado 2
 
-   13 expr: DOUBLE .
+   43 simple_condition: ID .
+   44                 | ID . CMP LOGIC
+   45                 | ID . CMP NUMBER
+   46                 | ID . CMP ID
+   49 cont: ID . '+' '+'
+   50     | ID . '-' '-'
+   55 declare: ID . '[' NUMBER ']' '=' array
+   56        | ID . '=' expr
+   57 asig: ID . '[' NUMBER ']' '[' NUMBER ']' '=' expr
+   58     | ID . '[' NUMBER ']' '=' expr
+   59     | ID . '=' ID
+   60     | ID . '=' expr_id
+   68 call_function: ID . '(' id_sec ')'
+   69              | ID . '(' sec_num ')'
 
-    $default  reduce using rule 13 (expr)
+    CMP  desplazar e ir al estado 29
+    '='  desplazar e ir al estado 30
+    '+'  desplazar e ir al estado 31
+    '-'  desplazar e ir al estado 32
+    '('  desplazar e ir al estado 33
+    '['  desplazar e ir al estado 34
 
-
-State 4
-
-   35 for_stat: FOR . LG asig SEMICOLON condition SEMICOLON cont RG LF END bloque RF
-
-    LG  shift, and go to state 43
-
-
-State 5
-
-   36 while_stat: WHILE . LG condition RG LF END bloque RF
-
-    LG  shift, and go to state 44
-
-
-State 6
-
-   37 print_stat: PRINT . LG ID RG
-   38           | PRINT . LG expr RG
-
-    LG  shift, and go to state 45
+    $default  reduce usando la regla 43 (simple_condition)
 
 
-State 7
+Estado 3
 
-   11 expr: LG . expr RG
+   13 expr: NUMBER .
 
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
-
-    expr  go to state 47
+    $default  reduce usando la regla 13 (expr)
 
 
-State 8
+Estado 4
 
-   59 cont: ADD . ADD ID
+   35 for_stat: FOR . '(' ID '=' expr ';' condition ';' cont ')' '{' END bloque '}'
 
-    ADD  shift, and go to state 48
-
-
-State 9
-
-   12 expr: SUB . expr
-   60 cont: SUB . SUB ID
-
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 49
-
-    expr  go to state 50
+    '('  desplazar e ir al estado 35
 
 
-State 10
+Estado 5
 
-   45 condition: TRUE .
+   36 while_stat: WHILE . '(' condition ')' '{' END bloque '}'
 
-    $default  reduce using rule 45 (condition)
-
-
-State 11
-
-   76 function: FUN . ID LG id_sec RG LF END bloque RETURN expr_id RF
-   77         | FUN . ID LG id_sec RG LF END bloque RETURN expr RF
-   78         | FUN . ID LG id_sec RG LF END bloque RF
-   79         | FUN . ID LG id_sec RG LF END bloque RF
-
-    ID  shift, and go to state 51
+    '('  desplazar e ir al estado 36
 
 
-State 12
+Estado 6
+
+   37 print_stat: PRINT . '(' ID ')'
+   38           | PRINT . '(' expr ')'
+
+    '('  desplazar e ir al estado 37
+
+
+Estado 7
+
+   64 function: FUN . ID '(' id_sec ')' '{' END bloque RETURN expr_id '}'
+   65         | FUN . ID '(' id_sec ')' '{' END bloque RETURN expr '}'
+   66         | FUN . ID '(' id_sec ')' '{' END bloque '}'
+   67         | FUN . ID '(' id_sec ')' '{' END bloque '}'
+
+    ID  desplazar e ir al estado 38
+
+
+Estado 8
+
+   42 condition: LOGIC .
+
+    $default  reduce usando la regla 42 (condition)
+
+
+Estado 9
 
     4 stmts: END . stmts
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
-    FUN     shift, and go to state 11
-    END     shift, and go to state 12
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    FUN     desplazar e ir al estado 7
+    LOGIC   desplazar e ir al estado 8
+    END     desplazar e ir al estado 9
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
-    $default  reduce using rule 2 (stmts)
+    $default  reduce usando la regla 2 (stmts)
 
-    stmts          go to state 52
-    expr           go to state 15
-    stat           go to state 16
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    function       go to state 26
-    call_function  go to state 27
-    if_stat        go to state 28
+    stmts             ir al estado 39
+    expr              ir al estado 15
+    stat              ir al estado 16
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    function          ir al estado 25
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
 
-State 13
+Estado 10
+
+   47 cont: '+' . '+' ID
+
+    '+'  desplazar e ir al estado 40
+
+
+Estado 11
+
+   12 expr: '-' . expr
+   48 cont: '-' . '-' ID
+
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 41
+    '('     desplazar e ir al estado 12
+
+    expr  ir al estado 42
+
+
+Estado 12
+
+   11 expr: '(' . expr ')'
+
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
+
+    expr  ir al estado 44
+
+
+Estado 13
 
     0 $accept: prog . $end
 
-    $end  shift, and go to state 53
+    $end  desplazar e ir al estado 45
 
 
-State 14
+Estado 14
 
     1 prog: stmts .
 
-    $default  reduce using rule 1 (prog)
+    $default  reduce usando la regla 1 (prog)
 
 
-State 15
+Estado 15
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
    32 stat: expr .
 
-    ADD  shift, and go to state 54
-    SUB  shift, and go to state 55
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
 
-    $default  reduce using rule 32 (stat)
+    $default  reduce usando la regla 32 (stat)
 
 
-State 16
+Estado 16
 
     3 stmts: stat . END stmts
 
-    END  shift, and go to state 59
+    END  desplazar e ir al estado 51
 
 
-State 17
+Estado 17
 
    24 stat: for_stat .
 
-    $default  reduce using rule 24 (stat)
+    $default  reduce usando la regla 24 (stat)
 
 
-State 18
+Estado 18
 
    25 stat: while_stat .
 
-    $default  reduce using rule 25 (stat)
+    $default  reduce usando la regla 25 (stat)
 
 
-State 19
+Estado 19
 
    26 stat: print_stat .
 
-    $default  reduce using rule 26 (stat)
+    $default  reduce usando la regla 26 (stat)
 
 
-State 20
+Estado 20
 
    27 stat: condition .
 
-    $default  reduce using rule 27 (stat)
+    $default  reduce usando la regla 27 (stat)
 
 
-State 21
+Estado 21
 
-   39 condition: bool_cond . AB AB condition
-   40          | bool_cond . OB OB condition
-   44          | bool_cond .
+   39 condition: simple_condition . '&' '&' condition
+   40          | simple_condition . '|' '|' condition
+   41          | simple_condition .
 
-    AB  shift, and go to state 60
-    OB  shift, and go to state 61
+    '&'  desplazar e ir al estado 52
+    '|'  desplazar e ir al estado 53
 
-    $default  reduce using rule 44 (condition)
-
-
-State 22
-
-   41 condition: num_cond . AB AB condition
-   42          | num_cond . OB OB condition
-   43          | num_cond .
-
-    AB  shift, and go to state 62
-    OB  shift, and go to state 63
-
-    $default  reduce using rule 43 (condition)
+    $default  reduce usando la regla 41 (condition)
 
 
-State 23
+Estado 22
 
    30 stat: cont .
 
-    $default  reduce using rule 30 (stat)
+    $default  reduce usando la regla 30 (stat)
 
 
-State 24
+Estado 23
 
    28 stat: declare .
 
-    $default  reduce using rule 28 (stat)
+    $default  reduce usando la regla 28 (stat)
 
 
-State 25
+Estado 24
 
    29 stat: asig .
 
-    $default  reduce using rule 29 (stat)
+    $default  reduce usando la regla 29 (stat)
 
 
-State 26
+Estado 25
 
     5 stmts: function . END stmts
 
-    END  shift, and go to state 64
+    END  desplazar e ir al estado 54
 
 
-State 27
+Estado 26
 
    31 stat: call_function .
 
-    $default  reduce using rule 31 (stat)
+    $default  reduce usando la regla 31 (stat)
 
 
-State 28
+Estado 27
 
    23 stat: if_stat .
 
-    $default  reduce using rule 23 (stat)
+    $default  reduce usando la regla 23 (stat)
 
 
-State 29
+Estado 28
 
-   82 if_stat: IF LG . condition RG LF END bloque RF ELSE LF END bloque RF
-   83        | IF LG . condition RG LF END bloque RF
+   70 if_stat: IF '(' . condition ')' '{' END bloque '}' ELSE '{' END bloque '}'
+   71        | IF '(' . condition ')' '{' END bloque '}'
 
-    ID    shift, and go to state 65
-    TRUE  shift, and go to state 10
+    ID     desplazar e ir al estado 55
+    LOGIC  desplazar e ir al estado 8
 
-    condition  go to state 66
-    bool_cond  go to state 21
-    num_cond   go to state 22
+    condition         ir al estado 56
+    simple_condition  ir al estado 21
 
 
-State 30
+Estado 29
 
-   55 oper: LT .
+   44 simple_condition: ID CMP . LOGIC
+   45                 | ID CMP . NUMBER
+   46                 | ID CMP . ID
 
-    $default  reduce using rule 55 (oper)
+    ID      desplazar e ir al estado 57
+    NUMBER  desplazar e ir al estado 58
+    LOGIC   desplazar e ir al estado 59
 
 
-State 31
+Estado 30
 
-   56 oper: LE .
+   56 declare: ID '=' . expr
+   59 asig: ID '=' . ID
+   60     | ID '=' . expr_id
 
-    $default  reduce using rule 56 (oper)
+    ID      desplazar e ir al estado 60
+    NUMBER  desplazar e ir al estado 61
+    '-'     desplazar e ir al estado 62
+    '('     desplazar e ir al estado 63
 
+    expr     ir al estado 64
+    expr_id  ir al estado 65
 
-State 32
 
-   50 neq_eq: EQ .
+Estado 31
 
-    $default  reduce using rule 50 (neq_eq)
+   49 cont: ID '+' . '+'
 
+    '+'  desplazar e ir al estado 66
 
-State 33
 
-   51 neq_eq: NE .
+Estado 32
 
-    $default  reduce using rule 51 (neq_eq)
+   50 cont: ID '-' . '-'
 
+    '-'  desplazar e ir al estado 67
 
-State 34
 
-   58 oper: GT .
+Estado 33
 
-    $default  reduce using rule 58 (oper)
+   68 call_function: ID '(' . id_sec ')'
+   69              | ID '(' . sec_num ')'
 
+    ID      desplazar e ir al estado 68
+    NUMBER  desplazar e ir al estado 69
 
-State 35
+    $default  reduce usando la regla 63 (id_sec)
 
-   57 oper: GE .
+    sec_num  ir al estado 70
+    id_sec   ir al estado 71
 
-    $default  reduce using rule 57 (oper)
 
+Estado 34
 
-State 36
+   55 declare: ID '[' . NUMBER ']' '=' array
+   57 asig: ID '[' . NUMBER ']' '[' NUMBER ']' '=' expr
+   58     | ID '[' . NUMBER ']' '=' expr
 
-   80 call_function: ID LG . id_sec RG
-   81              | ID LG . sec_num RG
+    NUMBER  desplazar e ir al estado 72
 
-    ID      shift, and go to state 67
-    DOUBLE  shift, and go to state 68
 
-    $default  reduce using rule 75 (id_sec)
+Estado 35
 
-    sec_num  go to state 69
-    id_sec   go to state 70
+   35 for_stat: FOR '(' . ID '=' expr ';' condition ';' cont ')' '{' END bloque '}'
 
+    ID  desplazar e ir al estado 73
 
-State 37
 
-   67 declare: ID LR . DOUBLE RR ASIG array
-   69 asig: ID LR . DOUBLE RR LR DOUBLE RR ASIG expr
-   70     | ID LR . DOUBLE RR ASIG expr
+Estado 36
 
-    DOUBLE  shift, and go to state 71
+   36 while_stat: WHILE '(' . condition ')' '{' END bloque '}'
 
+    ID     desplazar e ir al estado 55
+    LOGIC  desplazar e ir al estado 8
 
-State 38
+    condition         ir al estado 74
+    simple_condition  ir al estado 21
 
-   61 cont: ID ADD . ADD
 
-    ADD  shift, and go to state 72
+Estado 37
 
+   37 print_stat: PRINT '(' . ID ')'
+   38           | PRINT '(' . expr ')'
 
-State 39
+    ID      desplazar e ir al estado 75
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
 
-   62 cont: ID SUB . SUB
+    expr  ir al estado 76
 
-    SUB  shift, and go to state 73
 
+Estado 38
 
-State 40
+   64 function: FUN ID . '(' id_sec ')' '{' END bloque RETURN expr_id '}'
+   65         | FUN ID . '(' id_sec ')' '{' END bloque RETURN expr '}'
+   66         | FUN ID . '(' id_sec ')' '{' END bloque '}'
+   67         | FUN ID . '(' id_sec ')' '{' END bloque '}'
 
-   68 declare: ID ASIG . expr
-   71 asig: ID ASIG . ID
-   72     | ID ASIG . expr_id
+    '('  desplazar e ir al estado 77
 
-    ID      shift, and go to state 74
-    DOUBLE  shift, and go to state 75
-    LG      shift, and go to state 76
-    SUB     shift, and go to state 77
 
-    expr     go to state 78
-    expr_id  go to state 79
-
-
-State 41
-
-   47 bool_cond: ID neq_eq . TRUE
-   48          | ID neq_eq . FALSE
-   49          | ID neq_eq . ID
-   54 oper: neq_eq .
-
-    ID     shift, and go to state 80
-    FALSE  shift, and go to state 81
-    TRUE   shift, and go to state 82
-
-    ID        [reduce using rule 54 (oper)]
-    $default  reduce using rule 54 (oper)
-
-
-State 42
-
-   52 num_cond: ID oper . DOUBLE
-   53         | ID oper . ID
-
-    ID      shift, and go to state 83
-    DOUBLE  shift, and go to state 84
-
-
-State 43
-
-   35 for_stat: FOR LG . asig SEMICOLON condition SEMICOLON cont RG LF END bloque RF
-
-    ID  shift, and go to state 85
-
-    asig  go to state 86
-
-
-State 44
-
-   36 while_stat: WHILE LG . condition RG LF END bloque RF
-
-    ID    shift, and go to state 65
-    TRUE  shift, and go to state 10
-
-    condition  go to state 87
-    bool_cond  go to state 21
-    num_cond   go to state 22
-
-
-State 45
-
-   37 print_stat: PRINT LG . ID RG
-   38           | PRINT LG . expr RG
-
-    ID      shift, and go to state 88
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
-
-    expr  go to state 89
-
-
-State 46
-
-   12 expr: SUB . expr
-
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
-
-    expr  go to state 50
-
-
-State 47
-
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   11     | LG expr . RG
-
-    RG   shift, and go to state 90
-    ADD  shift, and go to state 54
-    SUB  shift, and go to state 55
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
-
-
-State 48
-
-   59 cont: ADD ADD . ID
-
-    ID  shift, and go to state 91
-
-
-State 49
-
-   12 expr: SUB . expr
-   60 cont: SUB SUB . ID
-
-    ID      shift, and go to state 92
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
-
-    expr  go to state 50
-
-
-State 50
-
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   12     | SUB expr .
-
-    $default  reduce using rule 12 (expr)
-
-
-State 51
-
-   76 function: FUN ID . LG id_sec RG LF END bloque RETURN expr_id RF
-   77         | FUN ID . LG id_sec RG LF END bloque RETURN expr RF
-   78         | FUN ID . LG id_sec RG LF END bloque RF
-   79         | FUN ID . LG id_sec RG LF END bloque RF
-
-    LG  shift, and go to state 93
-
-
-State 52
+Estado 39
 
     4 stmts: END stmts .
 
-    $default  reduce using rule 4 (stmts)
+    $default  reduce usando la regla 4 (stmts)
 
 
-State 53
+Estado 40
+
+   47 cont: '+' '+' . ID
+
+    ID  desplazar e ir al estado 78
+
+
+Estado 41
+
+   12 expr: '-' . expr
+   48 cont: '-' '-' . ID
+
+    ID      desplazar e ir al estado 79
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
+
+    expr  ir al estado 42
+
+
+Estado 42
+
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   12     | '-' expr .
+
+    POW  desplazar e ir al estado 46
+
+    $default  reduce usando la regla 12 (expr)
+
+
+Estado 43
+
+   12 expr: '-' . expr
+
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
+
+    expr  ir al estado 42
+
+
+Estado 44
+
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   11     | '(' expr . ')'
+
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
+    ')'  desplazar e ir al estado 80
+
+
+Estado 45
 
     0 $accept: prog $end .
 
-    $default  accept
+    $default  aceptar
 
 
-State 54
+Estado 46
 
-    6 expr: expr ADD . expr
+   10 expr: expr POW . expr
 
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
 
-    expr  go to state 94
-
-
-State 55
-
-    7 expr: expr SUB . expr
-
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
-
-    expr  go to state 95
+    expr  ir al estado 81
 
 
-State 56
+Estado 47
 
-    8 expr: expr MUL . expr
+    6 expr: expr '+' . expr
 
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
 
-    expr  go to state 96
-
-
-State 57
-
-    9 expr: expr DIV . expr
-
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
-
-    expr  go to state 97
+    expr  ir al estado 82
 
 
-State 58
+Estado 48
 
-   10 expr: expr POT . expr
+    7 expr: expr '-' . expr
 
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
 
-    expr  go to state 98
+    expr  ir al estado 83
 
 
-State 59
+Estado 49
+
+    8 expr: expr '*' . expr
+
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
+
+    expr  ir al estado 84
+
+
+Estado 50
+
+    9 expr: expr '/' . expr
+
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
+
+    expr  ir al estado 85
+
+
+Estado 51
 
     3 stmts: stat END . stmts
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
-    FUN     shift, and go to state 11
-    END     shift, and go to state 12
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    FUN     desplazar e ir al estado 7
+    LOGIC   desplazar e ir al estado 8
+    END     desplazar e ir al estado 9
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
-    $default  reduce using rule 2 (stmts)
+    $default  reduce usando la regla 2 (stmts)
 
-    stmts          go to state 99
-    expr           go to state 15
-    stat           go to state 16
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    function       go to state 26
-    call_function  go to state 27
-    if_stat        go to state 28
-
-
-State 60
-
-   39 condition: bool_cond AB . AB condition
-
-    AB  shift, and go to state 100
+    stmts             ir al estado 86
+    expr              ir al estado 15
+    stat              ir al estado 16
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    function          ir al estado 25
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
 
-State 61
+Estado 52
 
-   40 condition: bool_cond OB . OB condition
+   39 condition: simple_condition '&' . '&' condition
 
-    OB  shift, and go to state 101
-
-
-State 62
-
-   41 condition: num_cond AB . AB condition
-
-    AB  shift, and go to state 102
+    '&'  desplazar e ir al estado 87
 
 
-State 63
+Estado 53
 
-   42 condition: num_cond OB . OB condition
+   40 condition: simple_condition '|' . '|' condition
 
-    OB  shift, and go to state 103
+    '|'  desplazar e ir al estado 88
 
 
-State 64
+Estado 54
 
     5 stmts: function END . stmts
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
-    FUN     shift, and go to state 11
-    END     shift, and go to state 12
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    FUN     desplazar e ir al estado 7
+    LOGIC   desplazar e ir al estado 8
+    END     desplazar e ir al estado 9
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
-    $default  reduce using rule 2 (stmts)
+    $default  reduce usando la regla 2 (stmts)
 
-    stmts          go to state 104
-    expr           go to state 15
-    stat           go to state 16
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    function       go to state 26
-    call_function  go to state 27
-    if_stat        go to state 28
-
-
-State 65
-
-   46 bool_cond: ID .
-   47          | ID . neq_eq TRUE
-   48          | ID . neq_eq FALSE
-   49          | ID . neq_eq ID
-   52 num_cond: ID . oper DOUBLE
-   53         | ID . oper ID
-
-    LT  shift, and go to state 30
-    LE  shift, and go to state 31
-    EQ  shift, and go to state 32
-    NE  shift, and go to state 33
-    GT  shift, and go to state 34
-    GE  shift, and go to state 35
-
-    $default  reduce using rule 46 (bool_cond)
-
-    neq_eq  go to state 41
-    oper    go to state 42
+    stmts             ir al estado 89
+    expr              ir al estado 15
+    stat              ir al estado 16
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    function          ir al estado 25
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
 
-State 66
+Estado 55
 
-   82 if_stat: IF LG condition . RG LF END bloque RF ELSE LF END bloque RF
-   83        | IF LG condition . RG LF END bloque RF
+   43 simple_condition: ID .
+   44                 | ID . CMP LOGIC
+   45                 | ID . CMP NUMBER
+   46                 | ID . CMP ID
 
-    RG  shift, and go to state 105
+    CMP  desplazar e ir al estado 29
 
-
-State 67
-
-   73 id_sec: ID . COMMAN id_sec
-   74       | ID .
-
-    COMMAN  shift, and go to state 106
-
-    $default  reduce using rule 74 (id_sec)
+    $default  reduce usando la regla 43 (simple_condition)
 
 
-State 68
+Estado 56
 
-   63 sec_num: DOUBLE . COMMAN sec_num
-   64        | DOUBLE .
+   70 if_stat: IF '(' condition . ')' '{' END bloque '}' ELSE '{' END bloque '}'
+   71        | IF '(' condition . ')' '{' END bloque '}'
 
-    COMMAN  shift, and go to state 107
-
-    $default  reduce using rule 64 (sec_num)
+    ')'  desplazar e ir al estado 90
 
 
-State 69
+Estado 57
 
-   81 call_function: ID LG sec_num . RG
+   46 simple_condition: ID CMP ID .
 
-    RG  shift, and go to state 108
-
-
-State 70
-
-   80 call_function: ID LG id_sec . RG
-
-    RG  shift, and go to state 109
+    $default  reduce usando la regla 46 (simple_condition)
 
 
-State 71
+Estado 58
 
-   67 declare: ID LR DOUBLE . RR ASIG array
-   69 asig: ID LR DOUBLE . RR LR DOUBLE RR ASIG expr
-   70     | ID LR DOUBLE . RR ASIG expr
+   45 simple_condition: ID CMP NUMBER .
 
-    RR  shift, and go to state 110
+    $default  reduce usando la regla 45 (simple_condition)
 
 
-State 72
+Estado 59
 
-   61 cont: ID ADD ADD .
+   44 simple_condition: ID CMP LOGIC .
 
-    $default  reduce using rule 61 (cont)
-
-
-State 73
-
-   62 cont: ID SUB SUB .
-
-    $default  reduce using rule 62 (cont)
+    $default  reduce usando la regla 44 (simple_condition)
 
 
-State 74
+Estado 60
 
    21 expr_id: ID .
-   71 asig: ID ASIG ID .
+   59 asig: ID '=' ID .
 
-    SEMICOLON  reduce using rule 21 (expr_id)
-    SEMICOLON  [reduce using rule 71 (asig)]
-    END        reduce using rule 21 (expr_id)
-    END        [reduce using rule 71 (asig)]
-    $default   reduce using rule 21 (expr_id)
+    END       reduce usando la regla 21 (expr_id)
+    END       [reduce usando la regla 59 (asig)]
+    $default  reduce usando la regla 21 (expr_id)
 
 
-State 75
+Estado 61
 
-   13 expr: DOUBLE .
-   22 expr_id: DOUBLE .
+   13 expr: NUMBER .
+   22 expr_id: NUMBER .
 
-    RG        reduce using rule 13 (expr)
-    RG        [reduce using rule 22 (expr_id)]
-    ADD       reduce using rule 13 (expr)
-    ADD       [reduce using rule 22 (expr_id)]
-    SUB       reduce using rule 13 (expr)
-    SUB       [reduce using rule 22 (expr_id)]
-    MUL       reduce using rule 13 (expr)
-    MUL       [reduce using rule 22 (expr_id)]
-    DIV       reduce using rule 13 (expr)
-    DIV       [reduce using rule 22 (expr_id)]
-    POT       reduce using rule 13 (expr)
-    POT       [reduce using rule 22 (expr_id)]
-    RF        reduce using rule 13 (expr)
-    RF        [reduce using rule 22 (expr_id)]
-    END       reduce using rule 13 (expr)
-    END       [reduce using rule 22 (expr_id)]
-    $default  reduce using rule 13 (expr)
+    POW       reduce usando la regla 13 (expr)
+    POW       [reduce usando la regla 22 (expr_id)]
+    END       reduce usando la regla 13 (expr)
+    END       [reduce usando la regla 22 (expr_id)]
+    '+'       reduce usando la regla 13 (expr)
+    '+'       [reduce usando la regla 22 (expr_id)]
+    '-'       reduce usando la regla 13 (expr)
+    '-'       [reduce usando la regla 22 (expr_id)]
+    '*'       reduce usando la regla 13 (expr)
+    '*'       [reduce usando la regla 22 (expr_id)]
+    ')'       reduce usando la regla 13 (expr)
+    ')'       [reduce usando la regla 22 (expr_id)]
+    '}'       reduce usando la regla 13 (expr)
+    '}'       [reduce usando la regla 22 (expr_id)]
+    $default  reduce usando la regla 13 (expr)
 
 
-State 76
+Estado 62
 
-   11 expr: LG . expr RG
-   19 expr_id: LG . expr_id RG
+   12 expr: '-' . expr
+   20 expr_id: '-' . expr_id
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 75
-    LG      shift, and go to state 76
-    SUB     shift, and go to state 77
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 61
+    '-'     desplazar e ir al estado 62
+    '('     desplazar e ir al estado 63
 
-    expr     go to state 47
-    expr_id  go to state 112
+    expr     ir al estado 42
+    expr_id  ir al estado 92
 
 
-State 77
+Estado 63
 
-   12 expr: SUB . expr
-   20 expr_id: SUB . expr_id
+   11 expr: '(' . expr ')'
+   19 expr_id: '(' . expr_id ')'
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 75
-    LG      shift, and go to state 76
-    SUB     shift, and go to state 77
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 61
+    '-'     desplazar e ir al estado 62
+    '('     desplazar e ir al estado 63
 
-    expr     go to state 50
-    expr_id  go to state 113
+    expr     ir al estado 44
+    expr_id  ir al estado 93
 
 
-State 78
+Estado 64
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   68 declare: ID ASIG expr .
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   56 declare: ID '=' expr .
 
-    ADD  shift, and go to state 54
-    SUB  shift, and go to state 55
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
 
-    $default  reduce using rule 68 (declare)
+    $default  reduce usando la regla 56 (declare)
 
 
-State 79
+Estado 65
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
-   72 asig: ID ASIG expr_id .
+   14 expr_id: expr_id . '+' expr_id
+   15        | expr_id . '-' expr_id
+   16        | expr_id . '*' expr_id
+   17        | expr_id . '*' expr_id
+   18        | expr_id . POW expr_id
+   60 asig: ID '=' expr_id .
 
-    ADD  shift, and go to state 114
-    SUB  shift, and go to state 115
-    MUL  shift, and go to state 116
-    DIV  shift, and go to state 117
-    POT  shift, and go to state 118
+    POW  desplazar e ir al estado 94
+    '+'  desplazar e ir al estado 95
+    '-'  desplazar e ir al estado 96
+    '*'  desplazar e ir al estado 97
 
-    $default  reduce using rule 72 (asig)
+    $default  reduce usando la regla 60 (asig)
 
 
-State 80
+Estado 66
 
-   49 bool_cond: ID neq_eq ID .
+   49 cont: ID '+' '+' .
 
-    $default  reduce using rule 49 (bool_cond)
+    $default  reduce usando la regla 49 (cont)
 
 
-State 81
+Estado 67
 
-   48 bool_cond: ID neq_eq FALSE .
+   50 cont: ID '-' '-' .
 
-    $default  reduce using rule 48 (bool_cond)
+    $default  reduce usando la regla 50 (cont)
 
 
-State 82
+Estado 68
 
-   47 bool_cond: ID neq_eq TRUE .
+   61 id_sec: ID . ',' id_sec
+   62       | ID .
 
-    $default  reduce using rule 47 (bool_cond)
+    ','  desplazar e ir al estado 98
 
+    $default  reduce usando la regla 62 (id_sec)
 
-State 83
 
-   53 num_cond: ID oper ID .
+Estado 69
 
-    $default  reduce using rule 53 (num_cond)
+   51 sec_num: NUMBER . ',' sec_num
+   52        | NUMBER .
 
+    ','  desplazar e ir al estado 99
 
-State 84
+    $default  reduce usando la regla 52 (sec_num)
 
-   52 num_cond: ID oper DOUBLE .
 
-    $default  reduce using rule 52 (num_cond)
+Estado 70
 
+   69 call_function: ID '(' sec_num . ')'
 
-State 85
+    ')'  desplazar e ir al estado 100
 
-   69 asig: ID . LR DOUBLE RR LR DOUBLE RR ASIG expr
-   70     | ID . LR DOUBLE RR ASIG expr
-   71     | ID . ASIG ID
-   72     | ID . ASIG expr_id
 
-    LR    shift, and go to state 119
-    ASIG  shift, and go to state 120
+Estado 71
 
+   68 call_function: ID '(' id_sec . ')'
 
-State 86
+    ')'  desplazar e ir al estado 101
 
-   35 for_stat: FOR LG asig . SEMICOLON condition SEMICOLON cont RG LF END bloque RF
 
-    SEMICOLON  shift, and go to state 121
+Estado 72
 
+   55 declare: ID '[' NUMBER . ']' '=' array
+   57 asig: ID '[' NUMBER . ']' '[' NUMBER ']' '=' expr
+   58     | ID '[' NUMBER . ']' '=' expr
 
-State 87
+    ']'  desplazar e ir al estado 102
 
-   36 while_stat: WHILE LG condition . RG LF END bloque RF
 
-    RG  shift, and go to state 122
+Estado 73
 
+   35 for_stat: FOR '(' ID . '=' expr ';' condition ';' cont ')' '{' END bloque '}'
 
-State 88
+    '='  desplazar e ir al estado 103
 
-   37 print_stat: PRINT LG ID . RG
 
-    RG  shift, and go to state 123
+Estado 74
 
+   36 while_stat: WHILE '(' condition . ')' '{' END bloque '}'
 
-State 89
+    ')'  desplazar e ir al estado 104
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   38 print_stat: PRINT LG expr . RG
 
-    RG   shift, and go to state 124
-    ADD  shift, and go to state 54
-    SUB  shift, and go to state 55
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
+Estado 75
 
+   37 print_stat: PRINT '(' ID . ')'
 
-State 90
+    ')'  desplazar e ir al estado 105
 
-   11 expr: LG expr RG .
 
-    $default  reduce using rule 11 (expr)
+Estado 76
 
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   38 print_stat: PRINT '(' expr . ')'
 
-State 91
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
+    ')'  desplazar e ir al estado 106
 
-   59 cont: ADD ADD ID .
 
-    $default  reduce using rule 59 (cont)
+Estado 77
 
+   64 function: FUN ID '(' . id_sec ')' '{' END bloque RETURN expr_id '}'
+   65         | FUN ID '(' . id_sec ')' '{' END bloque RETURN expr '}'
+   66         | FUN ID '(' . id_sec ')' '{' END bloque '}'
+   67         | FUN ID '(' . id_sec ')' '{' END bloque '}'
 
-State 92
+    ID  desplazar e ir al estado 68
 
-   60 cont: SUB SUB ID .
+    $default  reduce usando la regla 63 (id_sec)
 
-    $default  reduce using rule 60 (cont)
+    id_sec  ir al estado 107
 
 
-State 93
+Estado 78
 
-   76 function: FUN ID LG . id_sec RG LF END bloque RETURN expr_id RF
-   77         | FUN ID LG . id_sec RG LF END bloque RETURN expr RF
-   78         | FUN ID LG . id_sec RG LF END bloque RF
-   79         | FUN ID LG . id_sec RG LF END bloque RF
+   47 cont: '+' '+' ID .
 
-    ID  shift, and go to state 67
+    $default  reduce usando la regla 47 (cont)
 
-    $default  reduce using rule 75 (id_sec)
 
-    id_sec  go to state 125
+Estado 79
 
+   48 cont: '-' '-' ID .
 
-State 94
+    $default  reduce usando la regla 48 (cont)
 
-    6 expr: expr . ADD expr
-    6     | expr ADD expr .
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
 
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
+Estado 80
 
-    $default  reduce using rule 6 (expr)
+   11 expr: '(' expr ')' .
 
+    $default  reduce usando la regla 11 (expr)
 
-State 95
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    7     | expr SUB expr .
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
+Estado 81
 
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   10     | expr POW expr .
 
-    $default  reduce using rule 7 (expr)
+    POW  desplazar e ir al estado 46
 
+    $default  reduce usando la regla 10 (expr)
 
-State 96
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    8     | expr MUL expr .
-    9     | expr . DIV expr
-   10     | expr . POT expr
+Estado 82
 
-    POT  shift, and go to state 58
+    6 expr: expr . '+' expr
+    6     | expr '+' expr .
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
 
-    $default  reduce using rule 8 (expr)
+    POW  desplazar e ir al estado 46
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
 
+    $default  reduce usando la regla 6 (expr)
 
-State 97
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-    9     | expr DIV expr .
-   10     | expr . POT expr
+Estado 83
 
-    POT  shift, and go to state 58
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    7     | expr '-' expr .
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
 
-    $default  reduce using rule 9 (expr)
+    POW  desplazar e ir al estado 46
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
 
+    $default  reduce usando la regla 7 (expr)
 
-State 98
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   10     | expr POT expr .
+Estado 84
 
-    POT  shift, and go to state 58
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    8     | expr '*' expr .
+    9     | expr . '/' expr
+   10     | expr . POW expr
 
-    $default  reduce using rule 10 (expr)
+    POW  desplazar e ir al estado 46
 
+    $default  reduce usando la regla 8 (expr)
 
-State 99
+
+Estado 85
+
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+    9     | expr '/' expr .
+   10     | expr . POW expr
+
+    POW  desplazar e ir al estado 46
+
+    $default  reduce usando la regla 9 (expr)
+
+
+Estado 86
 
     3 stmts: stat END stmts .
 
-    $default  reduce using rule 3 (stmts)
+    $default  reduce usando la regla 3 (stmts)
 
 
-State 100
+Estado 87
 
-   39 condition: bool_cond AB AB . condition
+   39 condition: simple_condition '&' '&' . condition
 
-    ID    shift, and go to state 65
-    TRUE  shift, and go to state 10
+    ID     desplazar e ir al estado 55
+    LOGIC  desplazar e ir al estado 8
 
-    condition  go to state 126
-    bool_cond  go to state 21
-    num_cond   go to state 22
-
-
-State 101
-
-   40 condition: bool_cond OB OB . condition
-
-    ID    shift, and go to state 65
-    TRUE  shift, and go to state 10
-
-    condition  go to state 127
-    bool_cond  go to state 21
-    num_cond   go to state 22
+    condition         ir al estado 108
+    simple_condition  ir al estado 21
 
 
-State 102
+Estado 88
 
-   41 condition: num_cond AB AB . condition
+   40 condition: simple_condition '|' '|' . condition
 
-    ID    shift, and go to state 65
-    TRUE  shift, and go to state 10
+    ID     desplazar e ir al estado 55
+    LOGIC  desplazar e ir al estado 8
 
-    condition  go to state 128
-    bool_cond  go to state 21
-    num_cond   go to state 22
-
-
-State 103
-
-   42 condition: num_cond OB OB . condition
-
-    ID    shift, and go to state 65
-    TRUE  shift, and go to state 10
-
-    condition  go to state 129
-    bool_cond  go to state 21
-    num_cond   go to state 22
+    condition         ir al estado 109
+    simple_condition  ir al estado 21
 
 
-State 104
+Estado 89
 
     5 stmts: function END stmts .
 
-    $default  reduce using rule 5 (stmts)
+    $default  reduce usando la regla 5 (stmts)
 
 
-State 105
+Estado 90
 
-   82 if_stat: IF LG condition RG . LF END bloque RF ELSE LF END bloque RF
-   83        | IF LG condition RG . LF END bloque RF
+   70 if_stat: IF '(' condition ')' . '{' END bloque '}' ELSE '{' END bloque '}'
+   71        | IF '(' condition ')' . '{' END bloque '}'
 
-    LF  shift, and go to state 130
-
-
-State 106
-
-   73 id_sec: ID COMMAN . id_sec
-
-    ID  shift, and go to state 67
-
-    $default  reduce using rule 75 (id_sec)
-
-    id_sec  go to state 131
+    '{'  desplazar e ir al estado 110
 
 
-State 107
-
-   63 sec_num: DOUBLE COMMAN . sec_num
-
-    DOUBLE  shift, and go to state 68
-
-    sec_num  go to state 132
-
-
-State 108
-
-   81 call_function: ID LG sec_num RG .
-
-    $default  reduce using rule 81 (call_function)
-
-
-State 109
-
-   80 call_function: ID LG id_sec RG .
-
-    $default  reduce using rule 80 (call_function)
-
-
-State 110
-
-   67 declare: ID LR DOUBLE RR . ASIG array
-   69 asig: ID LR DOUBLE RR . LR DOUBLE RR ASIG expr
-   70     | ID LR DOUBLE RR . ASIG expr
-
-    LR    shift, and go to state 133
-    ASIG  shift, and go to state 134
-
-
-State 111
+Estado 91
 
    21 expr_id: ID .
 
-    $default  reduce using rule 21 (expr_id)
+    $default  reduce usando la regla 21 (expr_id)
 
 
-State 112
+Estado 92
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
-   19        | LG expr_id . RG
+   14 expr_id: expr_id . '+' expr_id
+   15        | expr_id . '-' expr_id
+   16        | expr_id . '*' expr_id
+   17        | expr_id . '*' expr_id
+   18        | expr_id . POW expr_id
+   20        | '-' expr_id .
 
-    RG   shift, and go to state 135
-    ADD  shift, and go to state 114
-    SUB  shift, and go to state 115
-    MUL  shift, and go to state 116
-    DIV  shift, and go to state 117
-    POT  shift, and go to state 118
+    POW  desplazar e ir al estado 94
 
+    $default  reduce usando la regla 20 (expr_id)
 
-State 113
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
-   20        | SUB expr_id .
+Estado 93
 
-    $default  reduce using rule 20 (expr_id)
+   14 expr_id: expr_id . '+' expr_id
+   15        | expr_id . '-' expr_id
+   16        | expr_id . '*' expr_id
+   17        | expr_id . '*' expr_id
+   18        | expr_id . POW expr_id
+   19        | '(' expr_id . ')'
 
+    POW  desplazar e ir al estado 94
+    '+'  desplazar e ir al estado 95
+    '-'  desplazar e ir al estado 96
+    '*'  desplazar e ir al estado 97
+    ')'  desplazar e ir al estado 111
 
-State 114
 
-   14 expr_id: expr_id ADD . expr_id
+Estado 94
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
+   18 expr_id: expr_id POW . expr_id
 
-    expr_id  go to state 139
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 112
+    '-'     desplazar e ir al estado 113
+    '('     desplazar e ir al estado 114
 
+    expr_id  ir al estado 115
 
-State 115
 
-   15 expr_id: expr_id SUB . expr_id
+Estado 95
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
+   14 expr_id: expr_id '+' . expr_id
 
-    expr_id  go to state 140
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 112
+    '-'     desplazar e ir al estado 113
+    '('     desplazar e ir al estado 114
 
+    expr_id  ir al estado 116
 
-State 116
 
-   16 expr_id: expr_id MUL . expr_id
+Estado 96
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
+   15 expr_id: expr_id '-' . expr_id
 
-    expr_id  go to state 141
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 112
+    '-'     desplazar e ir al estado 113
+    '('     desplazar e ir al estado 114
 
+    expr_id  ir al estado 117
 
-State 117
 
-   17 expr_id: expr_id DIV . expr_id
+Estado 97
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
+   16 expr_id: expr_id '*' . expr_id
+   17        | expr_id '*' . expr_id
 
-    expr_id  go to state 142
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 112
+    '-'     desplazar e ir al estado 113
+    '('     desplazar e ir al estado 114
 
+    expr_id  ir al estado 118
 
-State 118
 
-   18 expr_id: expr_id POT . expr_id
+Estado 98
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
+   61 id_sec: ID ',' . id_sec
 
-    expr_id  go to state 143
+    ID  desplazar e ir al estado 68
 
+    $default  reduce usando la regla 63 (id_sec)
 
-State 119
+    id_sec  ir al estado 119
 
-   69 asig: ID LR . DOUBLE RR LR DOUBLE RR ASIG expr
-   70     | ID LR . DOUBLE RR ASIG expr
 
-    DOUBLE  shift, and go to state 144
+Estado 99
 
+   51 sec_num: NUMBER ',' . sec_num
 
-State 120
+    NUMBER  desplazar e ir al estado 69
 
-   71 asig: ID ASIG . ID
-   72     | ID ASIG . expr_id
+    sec_num  ir al estado 120
 
-    ID      shift, and go to state 74
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
 
-    expr_id  go to state 79
+Estado 100
 
+   69 call_function: ID '(' sec_num ')' .
 
-State 121
+    $default  reduce usando la regla 69 (call_function)
 
-   35 for_stat: FOR LG asig SEMICOLON . condition SEMICOLON cont RG LF END bloque RF
 
-    ID    shift, and go to state 65
-    TRUE  shift, and go to state 10
+Estado 101
 
-    condition  go to state 145
-    bool_cond  go to state 21
-    num_cond   go to state 22
+   68 call_function: ID '(' id_sec ')' .
 
+    $default  reduce usando la regla 68 (call_function)
 
-State 122
 
-   36 while_stat: WHILE LG condition RG . LF END bloque RF
+Estado 102
 
-    LF  shift, and go to state 146
+   55 declare: ID '[' NUMBER ']' . '=' array
+   57 asig: ID '[' NUMBER ']' . '[' NUMBER ']' '=' expr
+   58     | ID '[' NUMBER ']' . '=' expr
 
+    '='  desplazar e ir al estado 121
+    '['  desplazar e ir al estado 122
 
-State 123
 
-   37 print_stat: PRINT LG ID RG .
+Estado 103
 
-    $default  reduce using rule 37 (print_stat)
+   35 for_stat: FOR '(' ID '=' . expr ';' condition ';' cont ')' '{' END bloque '}'
 
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
 
-State 124
+    expr  ir al estado 123
 
-   38 print_stat: PRINT LG expr RG .
 
-    $default  reduce using rule 38 (print_stat)
+Estado 104
 
+   36 while_stat: WHILE '(' condition ')' . '{' END bloque '}'
 
-State 125
+    '{'  desplazar e ir al estado 124
 
-   76 function: FUN ID LG id_sec . RG LF END bloque RETURN expr_id RF
-   77         | FUN ID LG id_sec . RG LF END bloque RETURN expr RF
-   78         | FUN ID LG id_sec . RG LF END bloque RF
-   79         | FUN ID LG id_sec . RG LF END bloque RF
 
-    RG  shift, and go to state 147
+Estado 105
 
+   37 print_stat: PRINT '(' ID ')' .
 
-State 126
+    $default  reduce usando la regla 37 (print_stat)
 
-   39 condition: bool_cond AB AB condition .
 
-    $default  reduce using rule 39 (condition)
+Estado 106
 
+   38 print_stat: PRINT '(' expr ')' .
 
-State 127
+    $default  reduce usando la regla 38 (print_stat)
 
-   40 condition: bool_cond OB OB condition .
 
-    $default  reduce using rule 40 (condition)
+Estado 107
 
+   64 function: FUN ID '(' id_sec . ')' '{' END bloque RETURN expr_id '}'
+   65         | FUN ID '(' id_sec . ')' '{' END bloque RETURN expr '}'
+   66         | FUN ID '(' id_sec . ')' '{' END bloque '}'
+   67         | FUN ID '(' id_sec . ')' '{' END bloque '}'
 
-State 128
+    ')'  desplazar e ir al estado 125
 
-   41 condition: num_cond AB AB condition .
 
-    $default  reduce using rule 41 (condition)
+Estado 108
 
+   39 condition: simple_condition '&' '&' condition .
 
-State 129
+    $default  reduce usando la regla 39 (condition)
 
-   42 condition: num_cond OB OB condition .
 
-    $default  reduce using rule 42 (condition)
+Estado 109
 
+   40 condition: simple_condition '|' '|' condition .
 
-State 130
+    $default  reduce usando la regla 40 (condition)
 
-   82 if_stat: IF LG condition RG LF . END bloque RF ELSE LF END bloque RF
-   83        | IF LG condition RG LF . END bloque RF
 
-    END  shift, and go to state 148
+Estado 110
 
+   70 if_stat: IF '(' condition ')' '{' . END bloque '}' ELSE '{' END bloque '}'
+   71        | IF '(' condition ')' '{' . END bloque '}'
 
-State 131
+    END  desplazar e ir al estado 126
 
-   73 id_sec: ID COMMAN id_sec .
 
-    $default  reduce using rule 73 (id_sec)
+Estado 111
 
+   19 expr_id: '(' expr_id ')' .
 
-State 132
+    $default  reduce usando la regla 19 (expr_id)
 
-   63 sec_num: DOUBLE COMMAN sec_num .
 
-    $default  reduce using rule 63 (sec_num)
+Estado 112
 
+   22 expr_id: NUMBER .
 
-State 133
+    $default  reduce usando la regla 22 (expr_id)
 
-   69 asig: ID LR DOUBLE RR LR . DOUBLE RR ASIG expr
 
-    DOUBLE  shift, and go to state 149
+Estado 113
 
+   20 expr_id: '-' . expr_id
 
-State 134
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 112
+    '-'     desplazar e ir al estado 113
+    '('     desplazar e ir al estado 114
 
-   67 declare: ID LR DOUBLE RR ASIG . array
-   70 asig: ID LR DOUBLE RR ASIG . expr
+    expr_id  ir al estado 92
 
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    LR      shift, and go to state 150
-    SUB     shift, and go to state 46
 
-    expr   go to state 151
-    array  go to state 152
+Estado 114
 
+   19 expr_id: '(' . expr_id ')'
 
-State 135
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 112
+    '-'     desplazar e ir al estado 113
+    '('     desplazar e ir al estado 114
 
-   19 expr_id: LG expr_id RG .
+    expr_id  ir al estado 93
 
-    $default  reduce using rule 19 (expr_id)
 
+Estado 115
 
-State 136
+   14 expr_id: expr_id . '+' expr_id
+   15        | expr_id . '-' expr_id
+   16        | expr_id . '*' expr_id
+   17        | expr_id . '*' expr_id
+   18        | expr_id . POW expr_id
+   18        | expr_id POW expr_id .
 
-   22 expr_id: DOUBLE .
+    POW  desplazar e ir al estado 94
 
-    $default  reduce using rule 22 (expr_id)
+    $default  reduce usando la regla 18 (expr_id)
 
 
-State 137
+Estado 116
 
-   19 expr_id: LG . expr_id RG
+   14 expr_id: expr_id . '+' expr_id
+   14        | expr_id '+' expr_id .
+   15        | expr_id . '-' expr_id
+   16        | expr_id . '*' expr_id
+   17        | expr_id . '*' expr_id
+   18        | expr_id . POW expr_id
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
+    POW  desplazar e ir al estado 94
+    '*'  desplazar e ir al estado 97
 
-    expr_id  go to state 112
+    $default  reduce usando la regla 14 (expr_id)
 
 
-State 138
+Estado 117
 
-   20 expr_id: SUB . expr_id
+   14 expr_id: expr_id . '+' expr_id
+   15        | expr_id . '-' expr_id
+   15        | expr_id '-' expr_id .
+   16        | expr_id . '*' expr_id
+   17        | expr_id . '*' expr_id
+   18        | expr_id . POW expr_id
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 136
-    LG      shift, and go to state 137
-    SUB     shift, and go to state 138
+    POW  desplazar e ir al estado 94
+    '*'  desplazar e ir al estado 97
 
-    expr_id  go to state 113
+    $default  reduce usando la regla 15 (expr_id)
 
 
-State 139
+Estado 118
 
-   14 expr_id: expr_id . ADD expr_id
-   14        | expr_id ADD expr_id .
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
+   14 expr_id: expr_id . '+' expr_id
+   15        | expr_id . '-' expr_id
+   16        | expr_id . '*' expr_id
+   16        | expr_id '*' expr_id .
+   17        | expr_id . '*' expr_id
+   17        | expr_id '*' expr_id .
+   18        | expr_id . POW expr_id
 
-    MUL  shift, and go to state 116
-    DIV  shift, and go to state 117
-    POT  shift, and go to state 118
+    POW  desplazar e ir al estado 94
 
-    $default  reduce using rule 14 (expr_id)
+    END       reduce usando la regla 16 (expr_id)
+    END       [reduce usando la regla 17 (expr_id)]
+    '+'       reduce usando la regla 16 (expr_id)
+    '+'       [reduce usando la regla 17 (expr_id)]
+    '-'       reduce usando la regla 16 (expr_id)
+    '-'       [reduce usando la regla 17 (expr_id)]
+    '*'       reduce usando la regla 16 (expr_id)
+    '*'       [reduce usando la regla 17 (expr_id)]
+    ')'       reduce usando la regla 16 (expr_id)
+    ')'       [reduce usando la regla 17 (expr_id)]
+    '}'       reduce usando la regla 16 (expr_id)
+    '}'       [reduce usando la regla 17 (expr_id)]
+    $default  reduce usando la regla 16 (expr_id)
 
 
-State 140
+Estado 119
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   15        | expr_id SUB expr_id .
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
+   61 id_sec: ID ',' id_sec .
 
-    MUL  shift, and go to state 116
-    DIV  shift, and go to state 117
-    POT  shift, and go to state 118
+    $default  reduce usando la regla 61 (id_sec)
 
-    $default  reduce using rule 15 (expr_id)
 
+Estado 120
 
-State 141
+   51 sec_num: NUMBER ',' sec_num .
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   16        | expr_id MUL expr_id .
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
+    $default  reduce usando la regla 51 (sec_num)
 
-    POT  shift, and go to state 118
 
-    $default  reduce using rule 16 (expr_id)
+Estado 121
 
+   55 declare: ID '[' NUMBER ']' '=' . array
+   58 asig: ID '[' NUMBER ']' '=' . expr
 
-State 142
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
+    '['     desplazar e ir al estado 127
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   17        | expr_id DIV expr_id .
-   18        | expr_id . POT expr_id
+    expr   ir al estado 128
+    array  ir al estado 129
 
-    POT  shift, and go to state 118
 
-    $default  reduce using rule 17 (expr_id)
+Estado 122
 
+   57 asig: ID '[' NUMBER ']' '[' . NUMBER ']' '=' expr
 
-State 143
+    NUMBER  desplazar e ir al estado 130
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
-   18        | expr_id POT expr_id .
 
-    POT  shift, and go to state 118
+Estado 123
 
-    $default  reduce using rule 18 (expr_id)
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   35 for_stat: FOR '(' ID '=' expr . ';' condition ';' cont ')' '{' END bloque '}'
 
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
+    ';'  desplazar e ir al estado 131
 
-State 144
 
-   69 asig: ID LR DOUBLE . RR LR DOUBLE RR ASIG expr
-   70     | ID LR DOUBLE . RR ASIG expr
+Estado 124
 
-    RR  shift, and go to state 153
+   36 while_stat: WHILE '(' condition ')' '{' . END bloque '}'
 
+    END  desplazar e ir al estado 132
 
-State 145
 
-   35 for_stat: FOR LG asig SEMICOLON condition . SEMICOLON cont RG LF END bloque RF
+Estado 125
 
-    SEMICOLON  shift, and go to state 154
+   64 function: FUN ID '(' id_sec ')' . '{' END bloque RETURN expr_id '}'
+   65         | FUN ID '(' id_sec ')' . '{' END bloque RETURN expr '}'
+   66         | FUN ID '(' id_sec ')' . '{' END bloque '}'
+   67         | FUN ID '(' id_sec ')' . '{' END bloque '}'
 
+    '{'  desplazar e ir al estado 133
 
-State 146
 
-   36 while_stat: WHILE LG condition RG LF . END bloque RF
+Estado 126
 
-    END  shift, and go to state 155
+   70 if_stat: IF '(' condition ')' '{' END . bloque '}' ELSE '{' END bloque '}'
+   71        | IF '(' condition ')' '{' END . bloque '}'
 
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    LOGIC   desplazar e ir al estado 8
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
-State 147
+    $default  reduce usando la regla 34 (bloque)
 
-   76 function: FUN ID LG id_sec RG . LF END bloque RETURN expr_id RF
-   77         | FUN ID LG id_sec RG . LF END bloque RETURN expr RF
-   78         | FUN ID LG id_sec RG . LF END bloque RF
-   79         | FUN ID LG id_sec RG . LF END bloque RF
+    expr              ir al estado 15
+    stat              ir al estado 134
+    bloque            ir al estado 135
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
-    LF  shift, and go to state 156
 
+Estado 127
 
-State 148
+   53 array: '[' . sec_num ']'
+   54      | '[' . ']'
 
-   82 if_stat: IF LG condition RG LF END . bloque RF ELSE LF END bloque RF
-   83        | IF LG condition RG LF END . bloque RF
+    NUMBER  desplazar e ir al estado 69
+    ']'     desplazar e ir al estado 136
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
+    sec_num  ir al estado 137
 
-    $default  reduce using rule 34 (bloque)
 
-    expr           go to state 15
-    stat           go to state 157
-    bloque         go to state 158
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    call_function  go to state 27
-    if_stat        go to state 28
+Estado 128
 
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   58 asig: ID '[' NUMBER ']' '=' expr .
 
-State 149
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
 
-   69 asig: ID LR DOUBLE RR LR DOUBLE . RR ASIG expr
+    $default  reduce usando la regla 58 (asig)
 
-    RR  shift, and go to state 159
 
+Estado 129
 
-State 150
+   55 declare: ID '[' NUMBER ']' '=' array .
 
-   65 array: LR . sec_num RR
-   66      | LR . RR
+    $default  reduce usando la regla 55 (declare)
 
-    DOUBLE  shift, and go to state 68
-    RR      shift, and go to state 160
 
-    sec_num  go to state 161
+Estado 130
 
+   57 asig: ID '[' NUMBER ']' '[' NUMBER . ']' '=' expr
 
-State 151
+    ']'  desplazar e ir al estado 138
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   70 asig: ID LR DOUBLE RR ASIG expr .
 
-    ADD  shift, and go to state 54
-    SUB  shift, and go to state 55
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
+Estado 131
 
-    $default  reduce using rule 70 (asig)
+   35 for_stat: FOR '(' ID '=' expr ';' . condition ';' cont ')' '{' END bloque '}'
 
+    ID     desplazar e ir al estado 55
+    LOGIC  desplazar e ir al estado 8
 
-State 152
+    condition         ir al estado 139
+    simple_condition  ir al estado 21
 
-   67 declare: ID LR DOUBLE RR ASIG array .
 
-    $default  reduce using rule 67 (declare)
+Estado 132
 
+   36 while_stat: WHILE '(' condition ')' '{' END . bloque '}'
 
-State 153
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    LOGIC   desplazar e ir al estado 8
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
-   69 asig: ID LR DOUBLE RR . LR DOUBLE RR ASIG expr
-   70     | ID LR DOUBLE RR . ASIG expr
+    $default  reduce usando la regla 34 (bloque)
 
-    LR    shift, and go to state 133
-    ASIG  shift, and go to state 162
+    expr              ir al estado 15
+    stat              ir al estado 134
+    bloque            ir al estado 140
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
 
-State 154
+Estado 133
 
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON . cont RG LF END bloque RF
+   64 function: FUN ID '(' id_sec ')' '{' . END bloque RETURN expr_id '}'
+   65         | FUN ID '(' id_sec ')' '{' . END bloque RETURN expr '}'
+   66         | FUN ID '(' id_sec ')' '{' . END bloque '}'
+   67         | FUN ID '(' id_sec ')' '{' . END bloque '}'
 
-    ID   shift, and go to state 163
-    ADD  shift, and go to state 8
-    SUB  shift, and go to state 164
+    END  desplazar e ir al estado 141
 
-    cont  go to state 165
 
-
-State 155
-
-   36 while_stat: WHILE LG condition RG LF END . bloque RF
-
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
-
-    $default  reduce using rule 34 (bloque)
-
-    expr           go to state 15
-    stat           go to state 157
-    bloque         go to state 166
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    call_function  go to state 27
-    if_stat        go to state 28
-
-
-State 156
-
-   76 function: FUN ID LG id_sec RG LF . END bloque RETURN expr_id RF
-   77         | FUN ID LG id_sec RG LF . END bloque RETURN expr RF
-   78         | FUN ID LG id_sec RG LF . END bloque RF
-   79         | FUN ID LG id_sec RG LF . END bloque RF
-
-    END  shift, and go to state 167
-
-
-State 157
+Estado 134
 
    33 bloque: stat . END bloque
 
-    END  shift, and go to state 168
+    END  desplazar e ir al estado 142
 
 
-State 158
+Estado 135
 
-   82 if_stat: IF LG condition RG LF END bloque . RF ELSE LF END bloque RF
-   83        | IF LG condition RG LF END bloque . RF
+   70 if_stat: IF '(' condition ')' '{' END bloque . '}' ELSE '{' END bloque '}'
+   71        | IF '(' condition ')' '{' END bloque . '}'
 
-    RF  shift, and go to state 169
-
-
-State 159
-
-   69 asig: ID LR DOUBLE RR LR DOUBLE RR . ASIG expr
-
-    ASIG  shift, and go to state 170
+    '}'  desplazar e ir al estado 143
 
 
-State 160
+Estado 136
 
-   66 array: LR RR .
+   54 array: '[' ']' .
 
-    $default  reduce using rule 66 (array)
-
-
-State 161
-
-   65 array: LR sec_num . RR
-
-    RR  shift, and go to state 171
+    $default  reduce usando la regla 54 (array)
 
 
-State 162
+Estado 137
 
-   70 asig: ID LR DOUBLE RR ASIG . expr
+   53 array: '[' sec_num . ']'
 
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
-
-    expr  go to state 151
+    ']'  desplazar e ir al estado 144
 
 
-State 163
+Estado 138
 
-   61 cont: ID . ADD ADD
-   62     | ID . SUB SUB
+   57 asig: ID '[' NUMBER ']' '[' NUMBER ']' . '=' expr
 
-    ADD  shift, and go to state 38
-    SUB  shift, and go to state 39
+    '='  desplazar e ir al estado 145
 
 
-State 164
+Estado 139
 
-   60 cont: SUB . SUB ID
+   35 for_stat: FOR '(' ID '=' expr ';' condition . ';' cont ')' '{' END bloque '}'
 
-    SUB  shift, and go to state 172
-
-
-State 165
-
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont . RG LF END bloque RF
-
-    RG  shift, and go to state 173
+    ';'  desplazar e ir al estado 146
 
 
-State 166
+Estado 140
 
-   36 while_stat: WHILE LG condition RG LF END bloque . RF
+   36 while_stat: WHILE '(' condition ')' '{' END bloque . '}'
 
-    RF  shift, and go to state 174
-
-
-State 167
-
-   76 function: FUN ID LG id_sec RG LF END . bloque RETURN expr_id RF
-   77         | FUN ID LG id_sec RG LF END . bloque RETURN expr RF
-   78         | FUN ID LG id_sec RG LF END . bloque RF
-   79         | FUN ID LG id_sec RG LF END . bloque RF
-
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
-
-    $default  reduce using rule 34 (bloque)
-
-    expr           go to state 15
-    stat           go to state 157
-    bloque         go to state 175
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    call_function  go to state 27
-    if_stat        go to state 28
+    '}'  desplazar e ir al estado 147
 
 
-State 168
+Estado 141
+
+   64 function: FUN ID '(' id_sec ')' '{' END . bloque RETURN expr_id '}'
+   65         | FUN ID '(' id_sec ')' '{' END . bloque RETURN expr '}'
+   66         | FUN ID '(' id_sec ')' '{' END . bloque '}'
+   67         | FUN ID '(' id_sec ')' '{' END . bloque '}'
+
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    LOGIC   desplazar e ir al estado 8
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
+
+    $default  reduce usando la regla 34 (bloque)
+
+    expr              ir al estado 15
+    stat              ir al estado 134
+    bloque            ir al estado 148
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
+
+
+Estado 142
 
    33 bloque: stat END . bloque
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    LOGIC   desplazar e ir al estado 8
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
-    $default  reduce using rule 34 (bloque)
+    $default  reduce usando la regla 34 (bloque)
 
-    expr           go to state 15
-    stat           go to state 157
-    bloque         go to state 176
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    call_function  go to state 27
-    if_stat        go to state 28
-
-
-State 169
-
-   82 if_stat: IF LG condition RG LF END bloque RF . ELSE LF END bloque RF
-   83        | IF LG condition RG LF END bloque RF .
-
-    ELSE  shift, and go to state 177
-
-    $default  reduce using rule 83 (if_stat)
+    expr              ir al estado 15
+    stat              ir al estado 134
+    bloque            ir al estado 149
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
 
-State 170
+Estado 143
 
-   69 asig: ID LR DOUBLE RR LR DOUBLE RR ASIG . expr
+   70 if_stat: IF '(' condition ')' '{' END bloque '}' . ELSE '{' END bloque '}'
+   71        | IF '(' condition ')' '{' END bloque '}' .
 
-    DOUBLE  shift, and go to state 3
-    LG      shift, and go to state 7
-    SUB     shift, and go to state 46
+    ELSE  desplazar e ir al estado 150
 
-    expr  go to state 178
-
-
-State 171
-
-   65 array: LR sec_num RR .
-
-    $default  reduce using rule 65 (array)
+    $default  reduce usando la regla 71 (if_stat)
 
 
-State 172
+Estado 144
 
-   60 cont: SUB SUB . ID
+   53 array: '[' sec_num ']' .
 
-    ID  shift, and go to state 92
-
-
-State 173
-
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG . LF END bloque RF
-
-    LF  shift, and go to state 179
+    $default  reduce usando la regla 53 (array)
 
 
-State 174
+Estado 145
 
-   36 while_stat: WHILE LG condition RG LF END bloque RF .
+   57 asig: ID '[' NUMBER ']' '[' NUMBER ']' '=' . expr
 
-    $default  reduce using rule 36 (while_stat)
+    NUMBER  desplazar e ir al estado 3
+    '-'     desplazar e ir al estado 43
+    '('     desplazar e ir al estado 12
 
-
-State 175
-
-   76 function: FUN ID LG id_sec RG LF END bloque . RETURN expr_id RF
-   77         | FUN ID LG id_sec RG LF END bloque . RETURN expr RF
-   78         | FUN ID LG id_sec RG LF END bloque . RF
-   79         | FUN ID LG id_sec RG LF END bloque . RF
-
-    RF      shift, and go to state 180
-    RETURN  shift, and go to state 181
+    expr  ir al estado 151
 
 
-State 176
+Estado 146
+
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' . cont ')' '{' END bloque '}'
+
+    ID   desplazar e ir al estado 152
+    '+'  desplazar e ir al estado 10
+    '-'  desplazar e ir al estado 153
+
+    cont  ir al estado 154
+
+
+Estado 147
+
+   36 while_stat: WHILE '(' condition ')' '{' END bloque '}' .
+
+    $default  reduce usando la regla 36 (while_stat)
+
+
+Estado 148
+
+   64 function: FUN ID '(' id_sec ')' '{' END bloque . RETURN expr_id '}'
+   65         | FUN ID '(' id_sec ')' '{' END bloque . RETURN expr '}'
+   66         | FUN ID '(' id_sec ')' '{' END bloque . '}'
+   67         | FUN ID '(' id_sec ')' '{' END bloque . '}'
+
+    RETURN  desplazar e ir al estado 155
+    '}'     desplazar e ir al estado 156
+
+
+Estado 149
 
    33 bloque: stat END bloque .
 
-    $default  reduce using rule 33 (bloque)
+    $default  reduce usando la regla 33 (bloque)
 
 
-State 177
+Estado 150
 
-   82 if_stat: IF LG condition RG LF END bloque RF ELSE . LF END bloque RF
+   70 if_stat: IF '(' condition ')' '{' END bloque '}' ELSE . '{' END bloque '}'
 
-    LF  shift, and go to state 182
+    '{'  desplazar e ir al estado 157
 
 
-State 178
+Estado 151
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   69 asig: ID LR DOUBLE RR LR DOUBLE RR ASIG expr .
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   57 asig: ID '[' NUMBER ']' '[' NUMBER ']' '=' expr .
 
-    ADD  shift, and go to state 54
-    SUB  shift, and go to state 55
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
 
-    $default  reduce using rule 69 (asig)
+    $default  reduce usando la regla 57 (asig)
 
 
-State 179
+Estado 152
 
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF . END bloque RF
+   49 cont: ID . '+' '+'
+   50     | ID . '-' '-'
 
-    END  shift, and go to state 183
+    '+'  desplazar e ir al estado 31
+    '-'  desplazar e ir al estado 32
 
 
-State 180
+Estado 153
 
-   78 function: FUN ID LG id_sec RG LF END bloque RF .
-   79         | FUN ID LG id_sec RG LF END bloque RF .
+   48 cont: '-' . '-' ID
 
-    END       reduce using rule 78 (function)
-    END       [reduce using rule 79 (function)]
-    $default  reduce using rule 78 (function)
+    '-'  desplazar e ir al estado 158
 
 
-State 181
+Estado 154
 
-   76 function: FUN ID LG id_sec RG LF END bloque RETURN . expr_id RF
-   77         | FUN ID LG id_sec RG LF END bloque RETURN . expr RF
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' cont . ')' '{' END bloque '}'
 
-    ID      shift, and go to state 111
-    DOUBLE  shift, and go to state 75
-    LG      shift, and go to state 76
-    SUB     shift, and go to state 77
+    ')'  desplazar e ir al estado 159
 
-    expr     go to state 184
-    expr_id  go to state 185
 
+Estado 155
 
-State 182
+   64 function: FUN ID '(' id_sec ')' '{' END bloque RETURN . expr_id '}'
+   65         | FUN ID '(' id_sec ')' '{' END bloque RETURN . expr '}'
 
-   82 if_stat: IF LG condition RG LF END bloque RF ELSE LF . END bloque RF
+    ID      desplazar e ir al estado 91
+    NUMBER  desplazar e ir al estado 61
+    '-'     desplazar e ir al estado 62
+    '('     desplazar e ir al estado 63
 
-    END  shift, and go to state 186
+    expr     ir al estado 160
+    expr_id  ir al estado 161
 
 
-State 183
+Estado 156
 
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF END . bloque RF
+   66 function: FUN ID '(' id_sec ')' '{' END bloque '}' .
+   67         | FUN ID '(' id_sec ')' '{' END bloque '}' .
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
+    END       reduce usando la regla 66 (function)
+    END       [reduce usando la regla 67 (function)]
+    $default  reduce usando la regla 66 (function)
 
-    $default  reduce using rule 34 (bloque)
 
-    expr           go to state 15
-    stat           go to state 157
-    bloque         go to state 187
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    call_function  go to state 27
-    if_stat        go to state 28
+Estado 157
 
+   70 if_stat: IF '(' condition ')' '{' END bloque '}' ELSE '{' . END bloque '}'
 
-State 184
+    END  desplazar e ir al estado 162
 
-    6 expr: expr . ADD expr
-    7     | expr . SUB expr
-    8     | expr . MUL expr
-    9     | expr . DIV expr
-   10     | expr . POT expr
-   77 function: FUN ID LG id_sec RG LF END bloque RETURN expr . RF
 
-    ADD  shift, and go to state 54
-    SUB  shift, and go to state 55
-    MUL  shift, and go to state 56
-    DIV  shift, and go to state 57
-    POT  shift, and go to state 58
-    RF   shift, and go to state 188
+Estado 158
 
+   48 cont: '-' '-' . ID
 
-State 185
+    ID  desplazar e ir al estado 79
 
-   14 expr_id: expr_id . ADD expr_id
-   15        | expr_id . SUB expr_id
-   16        | expr_id . MUL expr_id
-   17        | expr_id . DIV expr_id
-   18        | expr_id . POT expr_id
-   76 function: FUN ID LG id_sec RG LF END bloque RETURN expr_id . RF
 
-    ADD  shift, and go to state 114
-    SUB  shift, and go to state 115
-    MUL  shift, and go to state 116
-    DIV  shift, and go to state 117
-    POT  shift, and go to state 118
-    RF   shift, and go to state 189
+Estado 159
 
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' . '{' END bloque '}'
 
-State 186
+    '{'  desplazar e ir al estado 163
 
-   82 if_stat: IF LG condition RG LF END bloque RF ELSE LF END . bloque RF
 
-    IF      shift, and go to state 1
-    ID      shift, and go to state 2
-    DOUBLE  shift, and go to state 3
-    FOR     shift, and go to state 4
-    WHILE   shift, and go to state 5
-    PRINT   shift, and go to state 6
-    LG      shift, and go to state 7
-    ADD     shift, and go to state 8
-    SUB     shift, and go to state 9
-    TRUE    shift, and go to state 10
+Estado 160
 
-    $default  reduce using rule 34 (bloque)
+    6 expr: expr . '+' expr
+    7     | expr . '-' expr
+    8     | expr . '*' expr
+    9     | expr . '/' expr
+   10     | expr . POW expr
+   65 function: FUN ID '(' id_sec ')' '{' END bloque RETURN expr . '}'
 
-    expr           go to state 15
-    stat           go to state 157
-    bloque         go to state 190
-    for_stat       go to state 17
-    while_stat     go to state 18
-    print_stat     go to state 19
-    condition      go to state 20
-    bool_cond      go to state 21
-    num_cond       go to state 22
-    cont           go to state 23
-    declare        go to state 24
-    asig           go to state 25
-    call_function  go to state 27
-    if_stat        go to state 28
+    POW  desplazar e ir al estado 46
+    '+'  desplazar e ir al estado 47
+    '-'  desplazar e ir al estado 48
+    '*'  desplazar e ir al estado 49
+    '/'  desplazar e ir al estado 50
+    '}'  desplazar e ir al estado 164
 
 
-State 187
+Estado 161
 
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF END bloque . RF
+   14 expr_id: expr_id . '+' expr_id
+   15        | expr_id . '-' expr_id
+   16        | expr_id . '*' expr_id
+   17        | expr_id . '*' expr_id
+   18        | expr_id . POW expr_id
+   64 function: FUN ID '(' id_sec ')' '{' END bloque RETURN expr_id . '}'
 
-    RF  shift, and go to state 191
+    POW  desplazar e ir al estado 94
+    '+'  desplazar e ir al estado 95
+    '-'  desplazar e ir al estado 96
+    '*'  desplazar e ir al estado 97
+    '}'  desplazar e ir al estado 165
 
 
-State 188
+Estado 162
 
-   77 function: FUN ID LG id_sec RG LF END bloque RETURN expr RF .
+   70 if_stat: IF '(' condition ')' '{' END bloque '}' ELSE '{' END . bloque '}'
 
-    $default  reduce using rule 77 (function)
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    LOGIC   desplazar e ir al estado 8
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
 
+    $default  reduce usando la regla 34 (bloque)
 
-State 189
+    expr              ir al estado 15
+    stat              ir al estado 134
+    bloque            ir al estado 166
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
 
-   76 function: FUN ID LG id_sec RG LF END bloque RETURN expr_id RF .
 
-    $default  reduce using rule 76 (function)
+Estado 163
 
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' . END bloque '}'
 
-State 190
+    END  desplazar e ir al estado 167
 
-   82 if_stat: IF LG condition RG LF END bloque RF ELSE LF END bloque . RF
 
-    RF  shift, and go to state 192
+Estado 164
 
+   65 function: FUN ID '(' id_sec ')' '{' END bloque RETURN expr '}' .
 
-State 191
+    $default  reduce usando la regla 65 (function)
 
-   35 for_stat: FOR LG asig SEMICOLON condition SEMICOLON cont RG LF END bloque RF .
 
-    $default  reduce using rule 35 (for_stat)
+Estado 165
 
+   64 function: FUN ID '(' id_sec ')' '{' END bloque RETURN expr_id '}' .
 
-State 192
+    $default  reduce usando la regla 64 (function)
 
-   82 if_stat: IF LG condition RG LF END bloque RF ELSE LF END bloque RF .
 
-    $default  reduce using rule 82 (if_stat)
+Estado 166
+
+   70 if_stat: IF '(' condition ')' '{' END bloque '}' ELSE '{' END bloque . '}'
+
+    '}'  desplazar e ir al estado 168
+
+
+Estado 167
+
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' END . bloque '}'
+
+    IF      desplazar e ir al estado 1
+    ID      desplazar e ir al estado 2
+    NUMBER  desplazar e ir al estado 3
+    FOR     desplazar e ir al estado 4
+    WHILE   desplazar e ir al estado 5
+    PRINT   desplazar e ir al estado 6
+    LOGIC   desplazar e ir al estado 8
+    '+'     desplazar e ir al estado 10
+    '-'     desplazar e ir al estado 11
+    '('     desplazar e ir al estado 12
+
+    $default  reduce usando la regla 34 (bloque)
+
+    expr              ir al estado 15
+    stat              ir al estado 134
+    bloque            ir al estado 169
+    for_stat          ir al estado 17
+    while_stat        ir al estado 18
+    print_stat        ir al estado 19
+    condition         ir al estado 20
+    simple_condition  ir al estado 21
+    cont              ir al estado 22
+    declare           ir al estado 23
+    asig              ir al estado 24
+    call_function     ir al estado 26
+    if_stat           ir al estado 27
+
+
+Estado 168
+
+   70 if_stat: IF '(' condition ')' '{' END bloque '}' ELSE '{' END bloque '}' .
+
+    $default  reduce usando la regla 70 (if_stat)
+
+
+Estado 169
+
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' END bloque . '}'
+
+    '}'  desplazar e ir al estado 170
+
+
+Estado 170
+
+   35 for_stat: FOR '(' ID '=' expr ';' condition ';' cont ')' '{' END bloque '}' .
+
+    $default  reduce usando la regla 35 (for_stat)

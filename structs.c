@@ -18,8 +18,8 @@ static int hashSymbol(char *symbol)			// Funcion de Hash lose lose
 
 struct symbol *iSymbol(char *character) 
 {
-	struct symbol *s = $(symbolTable[hashSymbol(character) % NHASH]);
-	int capSymbol = NHASH; 								// Capcidad maxima de la Tabla de simbolos
+	struct symbol *s =  &symbolTable[hashSymbol(character) % NHASH];
+	int capSymbol = NHASH; // Capcidad maxima de la Tabla de simbolos
 	while(--capSymbol >= 0)
 	{
 		if(s->name && !strcmp(s->name, character))		// Revisa si el simbolo ya existe
@@ -41,15 +41,18 @@ struct symbol *iSymbol(char *character)
 
 void yyerror(char *s)
 {
-	fprintf(stderr, "Error: %s\n", 	s);
+		fprintf(stderr, "Error: %s\n", 	s);
 }
 
 int main(int argc, char *argv[ ] ) {
     extern FILE *yyin;
     if (argc == 2){
-		if(yyin = fopen(argv[1],"r")){
+		FILE *file = fopen(argv[1], "r");
+		if (!file)
+		{
 			fprintf(stderr, "could not open %s\n",argv[1]);
 		}
+		yyin = file;
 	}
-    return yyparse();
+	return yyparse();
 }

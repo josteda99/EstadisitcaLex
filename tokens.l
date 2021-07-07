@@ -24,32 +24,32 @@ else        {return ELSE;}
 for         {return FOR;}
 while       {return WHILE;}
 print       {return PRINT;}
-false       {return FALSE;}
-true        {return TRUE;}
+false       {yylval.typeC = 'f'; return LOGIC;}
+true        {yylval.typeC = 't'; return LOGIC;}
 return      {return RETURN;}
 fun         {return FUN;}
-"<"         {return LT;} 
-"<="        {return LE;} 
-"=="        {return EQ;} 
-"!="        {return NE;} 
-">"         {return GT;} 
-">="        {return GE;}
-"("         {return LG;}
-")"         {return RG;}
-"["         {return LR;}
-"]"         {return RR;}
-"&"         {return AB;}
-"|"         {return OB;}
-"+"         {return ADD;}
-"-"         {return SUB;}
-"*"         {return MUL;}
-"/"         {return DIV;}
-"**"        {return POT;}
-"{"         {return LF;}
-"}"         {return RF;}
-";"         {return SEMICOLON;}
-","         {return COMMAN;}
-"="         {return ASIG;}
+"<"         {yylval.loCmp = 1; return CMP;} 
+"<="        {yylval.loCmp = 2; return CMP;} 
+"=="        {yylval.loCmp = 3; return CMP;} 
+"!="        {yylval.loCmp = 4; return CMP;} 
+">"         {yylval.loCmp = 5; return CMP;} 
+">="        {yylval.loCmp = 6; return CMP;}
+"**"        {return POW;}
+"(" | 
+")" |
+"[" | 
+"]" |
+"&" | 
+"|" |
+"+" | 
+"-" |
+"*" | 
+"/" |
+"{" | 
+"}" |
+";" | 
+"," |
+"="         {return yytext[0];}
 {integer}   {yylval.typeC = 'i'; yylval.d = atof(yytext); return NUMBER;}
 {double}    {yylval.typeC = 'd'; yylval.d = atof(yytext); return NUMBER;}
 {id}        {yylval.symbol =  iSymbol(yytext); return ID;}
@@ -69,6 +69,5 @@ fun         {return FUN;}
             }
 {com}
 "\n"        {return END;};
-.           {yyerror("Unknow Character.\n");}
 <<EOF>>     {static int once = 0; return (once = !once) ? END : 0;}
 %%

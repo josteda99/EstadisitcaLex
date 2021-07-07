@@ -19,5 +19,4 @@ struct symbol
 #define NHASH 9997
 struct symbol symbolTable[NHASH];
 
-
-symbol *iSymbol(char *s);
+struct symbol *iSymbol(char *s);
