@@ -12,8 +12,7 @@ ws          {delim}+
 letter      [A-Za-z]
 digit       [0-9]
 id          {letter}({letter}|{digit})*
-double      {digit}+(\.{digit}+)(E[+-]?{digit}+)?
-integer     {digit}+(E[+-]?{digit}+)?
+double      {digit}+(\.{digit}+)?(E[+-]?{digit}+)?
 slash       "/"
 com         {slash}{slash}(ws|.)*\n
 %%
@@ -50,9 +49,8 @@ fun         {return FUN;}
 ";" | 
 "," |
 "="         {return yytext[0];}
-{integer}   {yylval.d = newNumber(atof(yytext), 'i'); return NUMBER;}
-{double}    {yylval.d = newNumber(atof(yytext), 'f'); return NUMBER;}
-{id}        {yylval.symbol =  iSymbol(yytext); return ID;}
+{double}    {yylval.d = newNumber(atof(yytext)); return NUMBER;}
+{id}        {yylval.symbol =  lookUp(yytext); return ID;}
 "/*"        {register int c;
                 for ( ; ; ) {
                     while ( (c = input()) != '*' && c != EOF );    /* eat up text of comment */

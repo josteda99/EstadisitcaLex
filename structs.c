@@ -4,7 +4,6 @@
 #include <math.h>
 #include "structs.h"
 
-
 static int hashSymbol(char *symbol)			// Funcion de Hash lose lose 
 {
 	unsigned int hashValue = 0;
@@ -17,7 +16,7 @@ static int hashSymbol(char *symbol)			// Funcion de Hash lose lose
 	}
 }
 
-struct symbol *iSymbol(char *character) 
+struct symbol *lookUp(char *character) 
 {
 	struct symbol *s =  &symbolTable[hashSymbol(character) % NHASH];
 	int capSymbol = NHASH; // Capcidad maxima de la Tabla de simbolos
@@ -40,7 +39,7 @@ struct symbol *iSymbol(char *character)
 	abort();
 }
 
-struct numValue *newNumber(double number, char typeC)
+struct numValue *newNumber(double number)
 {
 	struct numValue *n = malloc(sizeof(struct numValue));
 	if(!n)
@@ -50,7 +49,6 @@ struct numValue *newNumber(double number, char typeC)
 	}
 	n->num = number;
 	n->nodeType = 'N';
-	n->numType = typeC;
 	return n;
 }
 
@@ -68,7 +66,7 @@ struct ast *newAst(int type, struct ast *left, struct ast *right)
 	return tree;
 }
 
-struct ast *callPrint(struct ast *left)
+struct ast *newPrint(struct ast *left)
 {
 	struct printStruct *p = malloc(sizeof(struct printStruct));
 	if(!p) 
@@ -81,17 +79,49 @@ struct ast *callPrint(struct ast *left)
 	return (struct ast *)p;
 }
 
+struct ast *newDeclaration(struct symbol *symbol, struct ast *left)
+{
+	struct declaration *d = malloc(sizeof(struct declaration));
+	if(!d)
+	{
+		yyerror("Out of memory");
+		exit(1);
+	}
+	d->nodeType='d';
+	d->symbol=symbol;
+	d->left=left;
+	return (struct ast *)d;
+}
+
+struct ast *newReference(struct symbol *symbol)
+{
+	struct refStruct *r = malloc(sizeof(struct refStruct));
+	if (!r) 
+	{
+		yyerror("Out of memory");
+		exit(1);
+	}
+	r->nodeType = 'R';
+	r->symbol = symbol;
+	return (struct ast *)r;
+}
+
 static double printStmt(struct printStruct *p);
+static double declrStmt(struct declaration *d);
 
 double evalStmt(struct ast *tree)
 {
 	double result;
+	// printf("nodeType-> %d\n", tree->nodeType);
 	switch (tree->nodeType)
 	{
-		case 'N':
+		case 'N':	// Number
 			result = ((struct numValue *)tree)->num;
 			break;
-		case '+':
+		case 'R': // Referencia a una variable
+			result = (((struct refStruct*)tree)->symbol)->value;
+			break;
+		case '+': // Operacion aritmetica hasta el case 'M'
 			result = evalStmt(tree->left) + evalStmt(tree->right);
 			break;
 		case '-':
@@ -106,11 +136,14 @@ double evalStmt(struct ast *tree)
 		case '_':
 			result = pow(evalStmt(tree->left),evalStmt(tree->right));
 			break;
-		case 'M':
+		case 'M':	
 			result = -evalStmt(tree->left);
 			break;
-		case 'P':
+		case 'P':	// Print
 			result = printStmt((struct printStruct *)tree);
+			break;
+		case 'd':	// Declaracion de variables
+			result = declrStmt((struct declaration *)tree);
 			break;
 		default:
 			printf("Internal Error :(\n");
@@ -119,12 +152,29 @@ double evalStmt(struct ast *tree)
 	return result;
 }
 
+void freeAst(struct ast *tree)
+{
+	free(tree);
+}
+
 static double printStmt(struct printStruct *p)
 {
 	double result = evalStmt(p->left);
-	printf("%f\n", result);
+	if((p->left)->nodeType == 'R')
+		printf("%s -> ",((struct refStruct *)(p->left))->symbol->name);
+	else
+		printf("Number -> ");
+	printf("%.2f\n", result);
 	return result;
 }
+
+static double declrStmt(struct declaration *d)
+{
+	(d->symbol)->value = evalStmt(d->left);
+	(d->symbol)->initialIndex = 0;
+	(d->symbol)->headArr = NULL;
+	// yyerror("Unknown primitive type\n");
+} 
 
 void yyerror(char *s)
 {

@@ -9,7 +9,7 @@
 %type <typeC> LOGIC
 %type <symbol> ID
 %type <d> NUMBER
-%type <tree> expr stat
+%type <tree> expr stat declare
 
 %union{
     char typeC;                 // Para saber si es Integer (d), Double (f), True (T), False (F)
@@ -52,15 +52,17 @@ expr: expr '+' expr                 {$$ = newAst('+', $1, $3);}
     | expr POW expr                 {$$ = newAst('_', $1, $3);}
     | '(' expr ')'                  {$$ = $2;}
     | '-' expr  %prec UMINUS        {$$ = newAst('M', $2, NULL);} 
-    | PRINT '(' expr ')'            {$$ = callPrint($3);}
+    | PRINT '(' expr ')'            {$$ = newPrint($3);}
     | NUMBER                        {$$ = (struct ast *)$1;}
-    | ID                            {};
+    | ID '[' expr ']' '[' expr ']'  {}
+    | ID '[' expr ']'               {}
+    | ID                            {$$ = newReference($1);};
 
 stat: if_stat            {}
     | for_stat           {}
     | while_stat         {}
     | condition          {}
-    | declare            {}
+    | declare            {evalStmt($1);}
     | cont               {}
     | call_function      {}
     | expr               {evalStmt($1);};
@@ -98,10 +100,11 @@ sec_array: array ',' sec_array
 
 matrix: '{' sec_array '}';
 
-declare: ID '[' expr ']' '[' expr ']' '=' matrix
-       | ID '[' expr ']' '[' expr ']' '=' expr
-       | ID '[' expr ']' '=' array
-       | ID '=' expr;
+declare: ID '[' expr ']' '[' expr ']' '=' matrix    {}
+       | ID '[' expr ']' '[' expr ']' '=' expr      {}
+       | ID '[' expr ']' '=' array                  {}
+       | ID '[' expr ']' '=' expr                   {}
+       | ID '=' expr                                {$$ = newDeclaration($1, $3);};
 
 id_sec: ID ',' id_sec
       | ID
